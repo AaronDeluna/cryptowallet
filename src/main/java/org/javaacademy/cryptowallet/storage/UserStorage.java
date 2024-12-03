@@ -12,14 +12,18 @@ public class UserStorage {
 
     public void save(User user) {
         if (userStorage.containsKey(user.getLogin())) {
-            throw new IllegalArgumentException("Ошибка: пользователь с логином: %s уже существует".formatted(user.getLogin()));
+            throw new IllegalArgumentException(
+                    "Ошибка: пользователь с логином '%s' уже зарегистрирован.".formatted(user.getLogin())
+            );
         }
         userStorage.put(user.getLogin(), user);
     }
 
     public User getUserByLogin(String login) throws IllegalArgumentException {
         if (!userStorage.containsKey(login)) {
-            throw new IllegalArgumentException("Ошибка: пользователь: %s не найден".formatted(login));
+            throw new IllegalArgumentException(
+                    "Ошибка: пользователь с логином '%s' не найден.".formatted(login)
+            );
         }
         return userStorage.get(login);
     }

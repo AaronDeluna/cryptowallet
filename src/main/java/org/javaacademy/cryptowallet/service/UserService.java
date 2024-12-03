@@ -22,7 +22,9 @@ public class UserService {
     public void resetPassword(ResetUserPassword resetUserPassword) {
         User user = getUserByLogin(resetUserPassword.getLogin());
         if (!user.getPassword().equals(resetUserPassword.getOldPassword())) {
-            throw new IllegalArgumentException("Ошибка: Не верно указан старый пароль, попробуйте еще раз");
+            throw new IllegalArgumentException(
+                    "Ошибка: текущий пароль указан неверно. Попробуйте ввести его еще раз."
+            );
         }
         user.setPassword(resetUserPassword.getNewPassword());
     }
