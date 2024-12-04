@@ -2,6 +2,7 @@ package org.javaacademy.cryptowallet.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.dto.ResetUserPassword;
+import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.entity.User;
 import org.javaacademy.cryptowallet.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +17,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public void signup(@RequestBody User user) {
-        userService.save(user);
+    public void signup(@RequestBody UserDto userDto) {
+        userService.save(userDto);
     }
 
     @PostMapping("/reset-password")

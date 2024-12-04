@@ -15,7 +15,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CryptoAccountService {
-    private final static String USER_LOGIN_NOTFOUND = "Ошибка: пользователя с логином %s не найден";
+    private static final String USER_LOGIN_NOTFOUND = "Ошибка: пользователя с логином %s не найден";
     private final CryptoStorage cryptoStorage;
     private final UserStorage userStorage;
 

@@ -24,7 +24,6 @@ public class CryptoStorage {
         cryptoStorage.put(cryptoAccount.getUuid(), cryptoAccount);
     }
 
-
     public CryptoAccount getCryptoAccountByUuid(UUID uuid) {
         return Optional.ofNullable(cryptoStorage.get(uuid))
                 .orElseThrow(
