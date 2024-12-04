@@ -20,11 +20,6 @@ public class UserStorage {
     }
 
     public User getUserByLogin(String login) throws IllegalArgumentException {
-        if (!userStorage.containsKey(login)) {
-            throw new IllegalArgumentException(
-                    "Ошибка: пользователь с логином '%s' не найден.".formatted(login)
-            );
-        }
         return userStorage.get(login);
     }
 }

@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.dto.ResetUserPassword;
 import org.javaacademy.cryptowallet.entity.User;
 import org.javaacademy.cryptowallet.storage.UserStorage;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class UserService {
+    private final static String PASSWORD_NOT_CORRECT = "Ошибка: текущий пароль указан неверно.";
     private final UserStorage userStorage;
 
     public void save(User user) {
@@ -22,9 +23,7 @@ public class UserService {
     public void resetPassword(ResetUserPassword resetUserPassword) {
         User user = getUserByLogin(resetUserPassword.getLogin());
         if (!user.getPassword().equals(resetUserPassword.getOldPassword())) {
-            throw new IllegalArgumentException(
-                    "Ошибка: текущий пароль указан неверно. Попробуйте ввести его еще раз."
-            );
+            throw new IllegalArgumentException(PASSWORD_NOT_CORRECT);
         }
         user.setPassword(resetUserPassword.getNewPassword());
     }
