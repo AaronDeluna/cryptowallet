@@ -1,4 +1,4 @@
-package org.javaacademy.cryptowallet.service;
+package org.javaacademy.cryptowallet.service.crypto;
 
 import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;

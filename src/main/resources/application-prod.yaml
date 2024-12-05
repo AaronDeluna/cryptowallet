@@ -1,0 +1,3 @@
+crypto:
+  api: https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=usd
+  token: xCVqoMDWXQpoSpqNTCshp5Ua
