@@ -13,14 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
+    private static final String SIGNUP_PATH = "/signup";
+    private static final String RESET_PASSWORD_PATH = "/reset-password";
     private final UserService userService;
 
-    @PostMapping("/signup")
+    @PostMapping(SIGNUP_PATH)
     public void signup(@RequestBody UserDto userDto) {
         userService.save(userDto);
     }
 
-    @PostMapping("/reset-password")
+    @PostMapping(RESET_PASSWORD_PATH)
     public void resetPassword(@RequestBody ResetUserPassword resetUserPassword) {
         userService.resetPassword(resetUserPassword);
     }

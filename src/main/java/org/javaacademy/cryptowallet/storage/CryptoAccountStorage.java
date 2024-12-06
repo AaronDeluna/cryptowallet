@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public class CryptoStorage {
+public class CryptoAccountStorage {
     private static final String CRYPTO_ACCOUNT_ID_EXIST = "Ошибка: счет с таким id '%s' уже существует";
     private static final String CRYPTO_ACCOUNT_ID_NOTFOUND = "Ошибка: счета с id '%s' не найден";
     private final Map<UUID, CryptoAccount> cryptoStorage = new HashMap<>();
