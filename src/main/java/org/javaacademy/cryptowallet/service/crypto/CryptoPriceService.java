@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 @Service
 @Profile("prod")
 public class CryptoPriceService implements CryptoPriceHandler {
+    private static final String API_KEY_HEADER = "x_cg_demo_api_key";
     @Value("${crypto.api}")
     private String url;
     @Value("${crypto.token}")
@@ -35,7 +36,7 @@ public class CryptoPriceService implements CryptoPriceHandler {
     private Request buildRequest(CryptoCurrency currency) {
         return new Request.Builder()
                 .url(url.formatted(currency.getDesc()))
-                .addHeader("x_cg_demo_api_key", token)
+                .addHeader(API_KEY_HEADER, token)
                 .get()
                 .build();
     }
