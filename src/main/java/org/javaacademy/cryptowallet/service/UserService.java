@@ -1,7 +1,7 @@
 package org.javaacademy.cryptowallet.service;
 
 import lombok.RequiredArgsConstructor;
-import org.javaacademy.cryptowallet.dto.ResetUserPassword;
+import org.javaacademy.cryptowallet.entity.ResetUserPassword;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.entity.User;
 import org.javaacademy.cryptowallet.mapper.UserMapper;
@@ -21,7 +21,7 @@ public class UserService {
     }
 
     public UserDto getUserByLogin(String login) throws IllegalArgumentException {
-        return userStorageRepository.getUserByLogin(login);
+        return userMapper.convertToDto(userStorageRepository.getUserByLogin(login));
     }
 
     public void resetPassword(ResetUserPassword resetUserPassword) {

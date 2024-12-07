@@ -17,8 +17,7 @@ public class UserStorageRepository {
         userStorage.save(user);
     }
 
-    public UserDto getUserByLogin(String login) {
-        User user = userStorage.getUserByLogin(login);
-        return userMapper.convertToDto(user);
+    public User getUserByLogin(String login) {
+        return userStorage.getUserByLogin(login);
     }
 }

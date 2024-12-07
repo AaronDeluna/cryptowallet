@@ -23,12 +23,12 @@ public class CryptoAccountController {
     private final CryptoAccountService cryptoAccountService;
 
     @GetMapping(GET_CRYPTO_ACCOUNT_BY_UUID_PATH)
-    public CryptoAccount getCryptoAccountByUuid(@PathVariable UUID uuid) {
+    public CryptoAccountDto getCryptoAccountByUuid(@PathVariable UUID uuid) {
         return cryptoAccountService.getCryptoAccountByUuid(uuid);
     }
 
     @GetMapping(ALL_ACCOUNTS_BY_USER_LOGIN_PATH)
-    public List<CryptoAccount> getAllCryptoAccountByUserLogin(@PathVariable String userLogin) {
+    public List<CryptoAccountDto> getAllCryptoAccountByUserLogin(@PathVariable String userLogin) {
         return cryptoAccountService.getAllCryptoAccountByUserLogin(userLogin);
     }
 

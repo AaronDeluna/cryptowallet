@@ -1,4 +1,4 @@
-package org.javaacademy.cryptowallet.dto;
+package org.javaacademy.cryptowallet.entity;
 
 import lombok.Data;
 import lombok.NonNull;

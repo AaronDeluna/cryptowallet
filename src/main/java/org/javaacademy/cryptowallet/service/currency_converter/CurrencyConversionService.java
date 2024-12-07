@@ -1,7 +1,6 @@
 package org.javaacademy.cryptowallet.service.currency_converter;
 
 import com.jayway.jsonpath.JsonPath;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -18,6 +17,7 @@ import java.math.RoundingMode;
 @Profile("prod")
 @Slf4j
 public class CurrencyConversionService implements CurrencyConversion {
+    private static final String INVALID_RESPONSE_ERROR = "Ошибка: Запрос не выполнен успешно или тело ответа пустое.";
     private static final String DOLLAR_RATE_JSON_PATH = "$.rates.USD";
     private static final int SCALE = 2;
     @Value("${central-bank.api}")
@@ -39,7 +39,7 @@ public class CurrencyConversionService implements CurrencyConversion {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
-                throw new RuntimeException();
+                throw new RuntimeException(INVALID_RESPONSE_ERROR);
             }
             String responseBody = response.body().string();
             return parseDollarPriceToResponse(responseBody);

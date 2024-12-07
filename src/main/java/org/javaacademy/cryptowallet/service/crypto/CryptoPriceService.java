@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 @Service
 @Profile("prod")
 public class CryptoPriceService implements CryptoPriceHandler {
+    private static final String INVALID_RESPONSE_ERROR = "Ошибка: Запрос не выполнен успешно или тело ответа пустое.";
     private static final String API_KEY_HEADER = "x_cg_demo_api_key";
     @Value("${crypto.api}")
     private String url;
@@ -27,7 +28,7 @@ public class CryptoPriceService implements CryptoPriceHandler {
         Request request = buildRequest(currency);
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
-                throw new IOException();
+                throw new RuntimeException(INVALID_RESPONSE_ERROR);
             }
             return extractPriceFromResponse(response.body().string(), currency);
         }

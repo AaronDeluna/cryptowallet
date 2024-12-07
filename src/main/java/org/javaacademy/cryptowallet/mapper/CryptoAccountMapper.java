@@ -16,8 +16,10 @@ public class CryptoAccountMapper {
 
     public CryptoAccountDto convertToDto(CryptoAccount cryptoAccount) {
         return new CryptoAccountDto(
+                cryptoAccount.getUuid(),
                 cryptoAccount.getUserLogin(),
-                cryptoAccount.getCurrency()
+                cryptoAccount.getCurrency(),
+                cryptoAccount.getCurrencyCount()
         );
     }
 }

@@ -20,19 +20,22 @@ public class CryptoAccountService {
     private final UserStorage userStorage;
     private final CryptoAccountMapper cryptoAccountMapper;
 
-    public CryptoAccount getCryptoAccountByUuid(UUID uuid) {
-        return cryptoAccountStorageRepository.getCryptoAccountByUuid(uuid);
+    public CryptoAccountDto getCryptoAccountByUuid(UUID uuid) {
+        return cryptoAccountMapper.convertToDto(
+                cryptoAccountStorageRepository.getCryptoAccountByUuid(uuid)
+        );
     }
 
-    public List<CryptoAccount> getAllCryptoAccountByUserLogin(String userLogin) {
-        return cryptoAccountStorageRepository.getAllCryptoAccountByUserLogin(userLogin);
+    public List<CryptoAccountDto> getAllCryptoAccountByUserLogin(String userLogin) {
+        return cryptoAccountStorageRepository.getAllCryptoAccountByUserLogin(userLogin).stream()
+                .map(cryptoAccountMapper::convertToDto)
+                .toList();
     }
 
     public UUID createCryptoAccount(CryptoAccountDto cryptoAccountDto) {
         Optional.ofNullable(userStorage.getUserByLogin(cryptoAccountDto.getUserLogin()))
-                .orElseThrow(
-                        () -> new IllegalArgumentException(
-                                USER_LOGIN_NOTFOUND.formatted(cryptoAccountDto.getUserLogin()))
+                .orElseThrow(() -> new IllegalArgumentException(
+                        USER_LOGIN_NOTFOUND.formatted(cryptoAccountDto.getUserLogin()))
                 );
 
         CryptoAccount cryptoAccount = cryptoAccountMapper.convertToEntity(cryptoAccountDto);
