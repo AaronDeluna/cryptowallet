@@ -1,3 +1,6 @@
 crypto:
   api: https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=usd
   token: xCVqoMDWXQpoSpqNTCshp5Ua
+
+central-bank:
+  api: "https://www.cbr-xml-daily.ru/latest.js"

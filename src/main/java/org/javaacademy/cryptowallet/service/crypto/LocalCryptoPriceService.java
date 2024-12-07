@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Service
 @Profile("local")
 public class LocalCryptoPriceService implements CryptoPriceHandler {
-    @Value("${crypto.price}")
+    @Value("${test-data.crypto.price}")
     private BigDecimal price;
 
     @Override

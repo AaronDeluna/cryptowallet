@@ -1,2 +1,6 @@
-crypto:
-  price: 10000
+test-data:
+  crypto:
+    price: 10000
+
+  dollar:
+    rate: 100
