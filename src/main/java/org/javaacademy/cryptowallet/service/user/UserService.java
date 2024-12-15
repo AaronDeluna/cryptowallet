@@ -26,7 +26,7 @@ public class UserService {
     public void resetPassword(ResetUserPassword resetUserPassword) {
         UserDto userDto = getUserByLogin(resetUserPassword.getLogin());
         if (!userDto.getPassword().equals(resetUserPassword.getOldPassword())) {
-            throw new IllegalArgumentException(PASSWORD_NOT_CORRECT);
+            throw new RuntimeException(PASSWORD_NOT_CORRECT);
         }
         userDto.setPassword(resetUserPassword.getNewPassword());
     }
