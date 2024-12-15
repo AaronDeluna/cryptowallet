@@ -7,7 +7,7 @@ import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 @Data
 public class CreateCryptoAccountDto {
     @JsonProperty("user_login")
-    private final String userLogin;
+    private String userLogin;
     @JsonProperty("crypto_currency")
-    private final CryptoCurrency currency;
+    private CryptoCurrency currency;
 }
