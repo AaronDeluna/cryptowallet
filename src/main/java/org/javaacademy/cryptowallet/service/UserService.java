@@ -1,7 +1,7 @@
 package org.javaacademy.cryptowallet.service;
 
 import lombok.RequiredArgsConstructor;
-import org.javaacademy.cryptowallet.entity.ResetUserPassword;
+import org.javaacademy.cryptowallet.dto.ResetUserPassword;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.entity.User;
 import org.javaacademy.cryptowallet.mapper.UserMapper;

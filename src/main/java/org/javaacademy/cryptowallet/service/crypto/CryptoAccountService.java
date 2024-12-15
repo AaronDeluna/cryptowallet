@@ -20,9 +20,9 @@ public class CryptoAccountService {
     private final UserStorage userStorage;
     private final CryptoAccountMapper cryptoAccountMapper;
 
-    public CryptoAccountDto getCryptoAccountByUuid(UUID uuid) {
+    public CryptoAccountDto getCryptoAccountByUuid(UUID id) {
         return cryptoAccountMapper.convertToDto(
-                cryptoAccountStorageRepository.getCryptoAccountByUuid(uuid)
+                cryptoAccountStorageRepository.getCryptoAccountByUuid(id)
         );
     }
 

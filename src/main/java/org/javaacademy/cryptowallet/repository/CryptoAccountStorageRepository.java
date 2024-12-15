@@ -17,8 +17,8 @@ public class CryptoAccountStorageRepository {
         cryptoAccountStorage.save(cryptoAccount);
     }
 
-    public CryptoAccount getCryptoAccountByUuid(UUID uuid) {
-        return cryptoAccountStorage.getCryptoAccountByUuid(uuid);
+    public CryptoAccount getCryptoAccountByUuid(UUID id) {
+        return cryptoAccountStorage.getCryptoAccountByUuid(id);
     }
 
     public List<CryptoAccount> getAllCryptoAccountByUserLogin(String userLogin) {
