@@ -1,7 +1,6 @@
 package org.javaacademy.cryptowallet.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.entity.User;
 import org.javaacademy.cryptowallet.mapper.UserMapper;
 import org.javaacademy.cryptowallet.storage.UserStorage;

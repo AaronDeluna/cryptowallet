@@ -1,6 +1,7 @@
 package org.javaacademy.cryptowallet.service.crypto;
 
 import lombok.RequiredArgsConstructor;
+import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
 import org.javaacademy.cryptowallet.mapper.CryptoAccountMapper;
@@ -32,13 +33,12 @@ public class CryptoAccountService {
                 .toList();
     }
 
-    public UUID createCryptoAccount(CryptoAccountDto cryptoAccountDto) {
-        Optional.ofNullable(userStorage.getUserByLogin(cryptoAccountDto.getUserLogin()))
+    public UUID createCryptoAccount(CreateCryptoAccountDto createDto) {
+        Optional.ofNullable(userStorage.getUserByLogin(createDto.getUserLogin()))
                 .orElseThrow(() -> new IllegalArgumentException(
-                        USER_LOGIN_NOTFOUND.formatted(cryptoAccountDto.getUserLogin()))
+                        USER_LOGIN_NOTFOUND.formatted(createDto.getUserLogin()))
                 );
-
-        CryptoAccount cryptoAccount = cryptoAccountMapper.convertToEntity(cryptoAccountDto);
+        CryptoAccount cryptoAccount = cryptoAccountMapper.convertToEntity(createDto);
         cryptoAccountStorageRepository.save(cryptoAccount);
         return cryptoAccount.getUuid();
     }
