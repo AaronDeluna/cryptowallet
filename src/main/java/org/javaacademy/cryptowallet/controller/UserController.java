@@ -1,9 +1,9 @@
 package org.javaacademy.cryptowallet.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.javaacademy.cryptowallet.dto.ResetUserPassword;
 import org.javaacademy.cryptowallet.dto.UserDto;
-import org.javaacademy.cryptowallet.service.UserService;
+import org.javaacademy.cryptowallet.service.user.ResetUserPassword;
+import org.javaacademy.cryptowallet.service.user.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

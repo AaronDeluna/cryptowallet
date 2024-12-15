@@ -1,7 +1,6 @@
-package org.javaacademy.cryptowallet.service;
+package org.javaacademy.cryptowallet.service.user;
 
 import lombok.RequiredArgsConstructor;
-import org.javaacademy.cryptowallet.dto.ResetUserPassword;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.entity.User;
 import org.javaacademy.cryptowallet.mapper.UserMapper;
@@ -27,7 +26,7 @@ public class UserService {
     public void resetPassword(ResetUserPassword resetUserPassword) {
         UserDto userDto = getUserByLogin(resetUserPassword.getLogin());
         if (!userDto.getPassword().equals(resetUserPassword.getOldPassword())) {
-            throw new IllegalArgumentException(PASSWORD_NOT_CORRECT);
+            throw new RuntimeException(PASSWORD_NOT_CORRECT);
         }
         userDto.setPassword(resetUserPassword.getNewPassword());
     }

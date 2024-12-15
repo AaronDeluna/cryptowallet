@@ -1,5 +1,6 @@
 package org.javaacademy.cryptowallet.storage;
 
+import lombok.Getter;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +11,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@Getter
 public class CryptoAccountStorage {
     private static final String CRYPTO_ACCOUNT_ID_EXIST = "Ошибка: счет с таким id '%s' уже существует";
     private static final String CRYPTO_ACCOUNT_ID_NOTFOUND = "Ошибка: счета с id '%s' не найден";
     private final Map<UUID, CryptoAccount> cryptoStorage = new HashMap<>();
+
+    //TODO Перенести логику методов в repository
 
     public void save(CryptoAccount cryptoAccount) {
         if (cryptoStorage.containsKey(cryptoAccount.getUuid())) {

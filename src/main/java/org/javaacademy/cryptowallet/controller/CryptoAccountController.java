@@ -1,14 +1,16 @@
 package org.javaacademy.cryptowallet.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
-import org.javaacademy.cryptowallet.entity.CryptoAccount;
 import org.javaacademy.cryptowallet.service.crypto.CryptoAccountService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -33,7 +35,8 @@ public class CryptoAccountController {
     }
 
     @PostMapping
-    public UUID createCryptoAccount(@RequestBody CryptoAccountDto cryptoAccountDto) {
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public UUID createCryptoAccount(@RequestBody CreateCryptoAccountDto cryptoAccountDto) {
         return cryptoAccountService.createCryptoAccount(cryptoAccountDto);
     }
 }

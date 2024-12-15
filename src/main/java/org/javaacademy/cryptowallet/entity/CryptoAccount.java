@@ -11,9 +11,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CryptoAccount {
-    private UUID uuid = UUID.randomUUID();
+    private UUID uuid;
     private String userLogin;
     private CryptoCurrency currency;
-    private BigDecimal currencyCount = BigDecimal.ZERO;
-
+    private BigDecimal currencyCount;
 }
