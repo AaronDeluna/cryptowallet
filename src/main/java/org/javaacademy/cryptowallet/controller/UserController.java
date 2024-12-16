@@ -21,7 +21,8 @@ public class UserController {
     public void signup(@RequestBody UserDto userDto) {
         userService.save(userDto);
     }
-    
+
+
     @PostMapping(RESET_PASSWORD_PATH)
     public void resetPassword(@RequestBody ResetUserPassword resetUserPassword) {
         userService.resetPassword(resetUserPassword);
