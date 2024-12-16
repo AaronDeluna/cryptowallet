@@ -10,14 +10,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.math.BigDecimal.ZERO;
+
 @Component
 @RequiredArgsConstructor
-public class CryptoAccountStorageRepository {
+public class CryptoAccountRepository {
     private static final String CRYPTO_ACCOUNT_ID_EXIST = "Ошибка: счет с таким id '%s' уже существует";
     private static final String CRYPTO_ACCOUNT_ID_NOTFOUND = "Ошибка: счета с id '%s' не найден";
     private final CryptoAccountStorage cryptoAccountStorage;
 
     public void save(CryptoAccount cryptoAccount) {
+        cryptoAccount.setUuid(UUID.randomUUID());
+        cryptoAccount.setCurrencyCount(ZERO);
         if (getStorage().containsKey(cryptoAccount.getUuid())) {
             throw new IllegalArgumentException(
                     CRYPTO_ACCOUNT_ID_EXIST.formatted(cryptoAccount.getUuid())
