@@ -16,18 +16,20 @@ public class UserStorageRepository {
     private final UserStorage userStorage;
 
     public void save(User user) {
-        Map<String, User> userData = userStorage.getUserStorage();
-        if (userData.containsKey(user.getLogin())) {
+        if (getStorage().containsKey(user.getLogin())) {
             throw new RuntimeException(USER_LOGIN_IS_EXIST.formatted(user.getLogin()));
         }
-        userData.put(user.getLogin(), user);
+        getStorage().put(user.getLogin(), user);
     }
 
     public User getUserByLogin(String login) throws IllegalArgumentException {
-        Map<String, User> userData = userStorage.getUserStorage();
-        return Optional.ofNullable(userData.get(login))
+        return Optional.ofNullable(getStorage().get(login))
                 .orElseThrow(
                         () -> new RuntimeException(LOGIN_NOTFOUND.formatted(login))
                 );
+    }
+
+    private Map<String, User> getStorage() {
+        return userStorage.getUserStorage();
     }
 }
