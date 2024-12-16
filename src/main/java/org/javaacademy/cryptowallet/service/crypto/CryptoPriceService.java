@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 public class CryptoPriceService implements CryptoPriceHandler {
     private static final String INVALID_RESPONSE_ERROR = "Ошибка: Запрос не выполнен успешно или тело ответа пустое.";
     private static final String API_KEY_HEADER = "x_cg_demo_api_key";
+    private static final String CRYPTO_CURRENCY_PRICE_PATH = "$.%s.usd";
     @Value("${crypto.api}")
     private String url;
     @Value("${crypto.token}")
@@ -43,7 +44,7 @@ public class CryptoPriceService implements CryptoPriceHandler {
     }
 
     private BigDecimal extractPriceFromResponse(String responseBody, CryptoCurrency currency) {
-        String jsonPath = "$." + currency.getDesc() + ".usd";
+        String jsonPath = CRYPTO_CURRENCY_PRICE_PATH.formatted(currency.getDesc());
         return JsonPath.parse(responseBody)
                 .read(JsonPath.compile(jsonPath), BigDecimal.class);
     }
