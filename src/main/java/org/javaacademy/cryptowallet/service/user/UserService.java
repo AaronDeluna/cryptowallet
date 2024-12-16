@@ -19,15 +19,11 @@ public class UserService {
         userStorageRepository.save(user);
     }
 
-    public UserDto getUserByLogin(String login) throws IllegalArgumentException {
-        return userMapper.convertToDto(userStorageRepository.getUserByLogin(login));
-    }
-
     public void resetPassword(ResetUserPassword resetUserPassword) {
-        UserDto userDto = getUserByLogin(resetUserPassword.getLogin());
-        if (!userDto.getPassword().equals(resetUserPassword.getOldPassword())) {
+        User user = userStorageRepository.getUserByLogin(resetUserPassword.getLogin());
+        if (!user.getPassword().equals(resetUserPassword.getOldPassword())) {
             throw new RuntimeException(PASSWORD_NOT_CORRECT);
         }
-        userDto.setPassword(resetUserPassword.getNewPassword());
+        user.setPassword(resetUserPassword.getNewPassword());
     }
 }
