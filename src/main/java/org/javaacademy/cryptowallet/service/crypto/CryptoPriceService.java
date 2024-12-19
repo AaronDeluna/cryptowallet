@@ -27,6 +27,7 @@ public class CryptoPriceService implements CryptoPriceHandler {
     @Override
     public BigDecimal getCryptoPriceByCurrency(CryptoCurrency currency) throws IOException {
         Request request = buildRequest(currency);
+
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
                 throw new RuntimeException(INVALID_RESPONSE_ERROR);

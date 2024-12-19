@@ -2,6 +2,7 @@ package org.javaacademy.cryptowallet.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
+import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
 import org.javaacademy.cryptowallet.storage.CryptoAccountStorage;
 import org.springframework.stereotype.Component;
 
@@ -23,21 +24,21 @@ public class CryptoAccountRepository {
         cryptoAccount.setUuid(UUID.randomUUID());
         cryptoAccount.setCurrencyCount(ZERO);
         if (getStorage().containsKey(cryptoAccount.getUuid())) {
-            throw new IllegalArgumentException(
+            throw new RuntimeException(
                     CRYPTO_ACCOUNT_ID_EXIST.formatted(cryptoAccount.getUuid())
             );
         }
         getStorage().put(cryptoAccount.getUuid(), cryptoAccount);
     }
 
-    public CryptoAccount getCryptoAccountByUuid(UUID uuid) {
+    public CryptoAccount findByUuid(UUID uuid) throws CryptoAccountNotFoundException {
         return Optional.ofNullable(getStorage().get(uuid))
                 .orElseThrow(
-                        () -> new IllegalArgumentException(CRYPTO_ACCOUNT_ID_NOTFOUND.formatted(uuid))
+                        () -> new CryptoAccountNotFoundException(CRYPTO_ACCOUNT_ID_NOTFOUND.formatted(uuid))
                 );
     }
 
-    public List<CryptoAccount> getAllCryptoAccountByUserLogin(String userLogin) {
+    public List<CryptoAccount> findAllByUserLogin(String userLogin) {
         return getStorage().values().stream()
                 .filter(cryptoAccount -> cryptoAccount.getUserLogin().equals(userLogin))
                 .toList();

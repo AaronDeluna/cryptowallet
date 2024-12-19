@@ -2,6 +2,7 @@ package org.javaacademy.cryptowallet.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.entity.User;
+import org.javaacademy.cryptowallet.exception.UserNotFoundException;
 import org.javaacademy.cryptowallet.storage.UserStorage;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +23,10 @@ public class UserStorageRepository {
         getStorage().put(user.getLogin(), user);
     }
 
-    public User getUserByLogin(String login) throws IllegalArgumentException {
+    public User findByLogin(String login) throws UserNotFoundException {
         return Optional.ofNullable(getStorage().get(login))
                 .orElseThrow(
-                        () -> new RuntimeException(LOGIN_NOTFOUND.formatted(login))
+                        () -> new UserNotFoundException(LOGIN_NOTFOUND.formatted(login))
                 );
     }
 
