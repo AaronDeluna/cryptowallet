@@ -1,7 +1,7 @@
 package org.javaacademy.cryptowallet.service.currency_converter;
 
 import com.jayway.jsonpath.JsonPath;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -15,14 +15,14 @@ import java.math.RoundingMode;
 
 @Service
 @Profile("prod")
-@Slf4j
-public class CurrencyConversionService implements CurrencyConversion {
+@RequiredArgsConstructor
+public class CurrencyConversionServiceImpl implements CurrencyConversion {
     private static final String INVALID_RESPONSE_ERROR = "Ошибка: Запрос не выполнен успешно или тело ответа пустое.";
     private static final String DOLLAR_RATE_JSON_PATH = "$.rates.USD";
     private static final int SCALE = 2;
     @Value("${central-bank.api}")
     private String centralBankApi;
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client;
 
     @Override
     public BigDecimal convertDollarToRubles(BigDecimal dollarCount) throws IOException {

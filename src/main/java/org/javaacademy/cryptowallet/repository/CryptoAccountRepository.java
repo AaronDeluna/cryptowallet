@@ -6,6 +6,7 @@ import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
 import org.javaacademy.cryptowallet.storage.CryptoAccountStorage;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,6 +43,11 @@ public class CryptoAccountRepository {
         return getStorage().values().stream()
                 .filter(cryptoAccount -> cryptoAccount.getUserLogin().equals(userLogin))
                 .toList();
+    }
+
+    public void updateBalanceByUuid(UUID uuid, BigDecimal updateCryptoBalance) throws CryptoAccountNotFoundException {
+        CryptoAccount cryptoAccount = findByUuid(uuid);
+        cryptoAccount.setCurrencyCount(cryptoAccount.getCurrencyCount().add(updateCryptoBalance));
     }
 
     private Map<UUID, CryptoAccount> getStorage() {

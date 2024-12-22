@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.exception.InvalidPasswordException;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
-import org.javaacademy.cryptowallet.service.user.ResetUserPassword;
+import org.javaacademy.cryptowallet.dto.ResetUserPasswordDto;
 import org.javaacademy.cryptowallet.service.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,20 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-    private static final String SIGNUP_PATH = "/signup";
-    private static final String RESET_PASSWORD_PATH = "/reset-password";
     private final UserService userService;
 
-    @PostMapping(SIGNUP_PATH)
+    @PostMapping("/signup")
     public void signup(@RequestBody UserDto userDto) {
         userService.save(userDto);
     }
 
 
-    @PostMapping(RESET_PASSWORD_PATH)
-    public ResponseEntity<?> resetPassword(@RequestBody ResetUserPassword resetUserPassword) {
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetUserPasswordDto resetUserPasswordDto) {
         try {
-            userService.resetPassword(resetUserPassword);
+            userService.resetPassword(resetUserPasswordDto);
             return ResponseEntity.ok().build();
         } catch (UserNotFoundException | InvalidPasswordException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

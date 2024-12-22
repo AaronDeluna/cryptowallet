@@ -5,22 +5,34 @@ import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class CryptoAccountMapper {
 
-    public CryptoAccount convertToEntity(CreateCryptoAccountDto createDto) {
+    public CryptoAccount toEntity(CreateCryptoAccountDto createDto) {
         return new CryptoAccount(
                 createDto.getUserLogin(),
                 createDto.getCurrency()
         );
     }
 
-    public CryptoAccountDto convertToDto(CryptoAccount cryptoAccount) {
+    public CryptoAccountDto toDto(CryptoAccount cryptoAccount) {
         return new CryptoAccountDto(
                 cryptoAccount.getUuid(),
                 cryptoAccount.getUserLogin(),
                 cryptoAccount.getCurrency(),
                 cryptoAccount.getCurrencyCount()
         );
+    }
+
+    public List<CryptoAccountDto> toDtos(List<CryptoAccount> cryptoAccounts) {
+        return cryptoAccounts.stream().map(cryptoAccount ->
+                        new CryptoAccountDto(
+                                cryptoAccount.getUuid(),
+                                cryptoAccount.getUserLogin(),
+                                cryptoAccount.getCurrency(),
+                                cryptoAccount.getCurrencyCount()))
+                .toList();
     }
 }

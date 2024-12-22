@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 @Service
 @Profile("local")
-public class LocalCryptoPriceService implements CryptoPriceHandler {
+public class MockCryptoPriceService implements CryptoPriceService {
     @Value("${test-data.crypto.price}")
     private BigDecimal price;
 

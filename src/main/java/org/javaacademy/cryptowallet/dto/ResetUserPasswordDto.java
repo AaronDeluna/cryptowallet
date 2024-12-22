@@ -1,4 +1,4 @@
-package org.javaacademy.cryptowallet.service.user;
+package org.javaacademy.cryptowallet.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import lombok.NonNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResetUserPassword {
+public class ResetUserPasswordDto {
     @NonNull
     private String login;
     @NonNull

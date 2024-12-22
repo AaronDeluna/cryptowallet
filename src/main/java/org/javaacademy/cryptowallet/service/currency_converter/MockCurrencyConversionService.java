@@ -9,10 +9,11 @@ import java.math.RoundingMode;
 
 @Service
 @Profile("local")
-public class LocalCurrencyConversionService implements CurrencyConversion {
+public class MockCurrencyConversionService implements CurrencyConversion {
     private static final int SCALE = 2;
     @Value("${test-data.dollar.rate}")
     private BigDecimal dollarRate;
+
     @Override
     public BigDecimal convertDollarToRubles(BigDecimal dollarCount) {
         return dollarCount.divide(dollarRate, SCALE, RoundingMode.HALF_UP);

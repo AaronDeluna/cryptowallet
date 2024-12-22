@@ -1,6 +1,7 @@
 package org.javaacademy.cryptowallet.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.javaacademy.cryptowallet.dto.ResetUserPasswordDto;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.entity.User;
 import org.javaacademy.cryptowallet.exception.InvalidPasswordException;
@@ -21,12 +22,12 @@ public class UserService {
         userStorageRepository.save(user);
     }
 
-    public void resetPassword(ResetUserPassword resetUserPassword) throws UserNotFoundException,
+    public void resetPassword(ResetUserPasswordDto resetUserPasswordDto) throws UserNotFoundException,
             InvalidPasswordException {
-        User user = userStorageRepository.findByLogin(resetUserPassword.getLogin());
-        if (!user.getPassword().equals(resetUserPassword.getOldPassword())) {
+        User user = userStorageRepository.findByLogin(resetUserPasswordDto.getLogin());
+        if (!user.getPassword().equals(resetUserPasswordDto.getOldPassword())) {
             throw new InvalidPasswordException(PASSWORD_NOT_CORRECT);
         }
-        user.setPassword(resetUserPassword.getNewPassword());
+        user.setPassword(resetUserPasswordDto.getNewPassword());
     }
 }

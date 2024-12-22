@@ -3,5 +3,5 @@ package org.javaacademy.cryptowallet.exception;
 import lombok.experimental.StandardException;
 
 @StandardException
-public class InvalidPasswordException extends Exception {
+public class InvalidPasswordException extends RuntimeException {
 }
