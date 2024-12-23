@@ -7,6 +7,7 @@ import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
 import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
+import org.javaacademy.cryptowallet.exception.InsufficientFundsException;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
 import org.javaacademy.cryptowallet.mapper.CryptoAccountMapper;
 import org.javaacademy.cryptowallet.repository.CryptoAccountRepository;
@@ -25,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 @Slf4j
 public class CryptoAccountService {
-    private static final String INSUFFICIENT_FUNDS_MESSAGE = "Ошибка: На счёте недостаточно средств!";
+    private static final String INSUFFICIENT_FUNDS_MESSAGE = "На счету недостаточно средств!";
     private static final String OPERATION_SUCCESS_SOLD_MESSAGE = "Операция прошла успешно. Продано: %s";
     private static final int SCALE = 8;
     private final CryptoAccountRepository cryptoAccountRepository;
@@ -52,22 +53,17 @@ public class CryptoAccountService {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
                 cryptoAccountRepository.findByUuid(cryptoAccountId)
         );
-        CryptoCurrency cryptoCurrency = cryptoAccountDto.getCurrency();
-        BigDecimal cryptoPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
-        BigDecimal dollarAmount = currencyConversion.convertRubleToDollar(rubleCount);
-        BigDecimal updateCryptoBalance = dollarAmount.divide(cryptoPrice, SCALE, RoundingMode.HALF_UP);
-        cryptoAccountRepository.updateBalanceByUuid(cryptoAccountDto.getUuid(), updateCryptoBalance);
+        BigDecimal cryptoAmount = calculateCryptoAmount(rubleCount, cryptoAccountDto.getCurrency());
+        replenishAccountBalance(cryptoAccountDto, cryptoAmount);
     }
 
-    //TODO Задача 1.0 не верно работает логика, переписать!
     public String withdrawRublesFromAccount(UUID cryptoAccountId, BigDecimal rubleCount)
-            throws CryptoAccountNotFoundException, IOException {
+            throws CryptoAccountNotFoundException, IOException, InsufficientFundsException {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
                 cryptoAccountRepository.findByUuid(cryptoAccountId)
         );
         BigDecimal cryptoAmount = calculateCryptoAmount(rubleCount, cryptoAccountDto.getCurrency());
-        validateSufficientFunds(cryptoAccountDto, rubleCount);
-        updateAccountBalanceAfterWithdrawal(cryptoAccountDto, cryptoAmount);
+        decreaseAccountBalance(cryptoAccountDto, cryptoAmount);
         return OPERATION_SUCCESS_SOLD_MESSAGE.formatted(cryptoAmount);
     }
 
@@ -84,8 +80,7 @@ public class CryptoAccountService {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
                 cryptoAccountRepository.findByUuid(cryptoAccountId)
         );
-        BigDecimal rubleAmount = getRubleAmountByCryptoAccount(cryptoAccountDto);
-        return rubleAmount;
+        return calculateRubleAmount(cryptoAccountDto);
     }
 
     /**
@@ -101,13 +96,13 @@ public class CryptoAccountService {
         );
 
         cryptoAccountsDto.forEach(cryptoAccount ->
-                totalRubleAmount.set(totalRubleAmount.get().add(getRubleAmountByCryptoAccount(cryptoAccount)))
+                totalRubleAmount.set(totalRubleAmount.get().add(calculateRubleAmount(cryptoAccount)))
         );
 
         return totalRubleAmount.get();
     }
 
-    private BigDecimal getRubleAmountByCryptoAccount(CryptoAccountDto cryptoAccountDto) {
+    private BigDecimal calculateRubleAmount(CryptoAccountDto cryptoAccountDto) {
         try {
             CryptoCurrency cryptoCurrency = cryptoAccountDto.getCurrency();
             BigDecimal cryptoDollarPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
@@ -119,22 +114,29 @@ public class CryptoAccountService {
     }
 
     private BigDecimal calculateCryptoAmount(BigDecimal rubleCount, CryptoCurrency cryptoCurrency) throws IOException {
-        BigDecimal cryptoCurrencyPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
-        BigDecimal rubleAmount = currencyConversion.convertRubleToDollar(rubleCount);
-        BigDecimal totalDollarAmount = currencyConversion.convertDollarToRubles(rubleAmount);
-        return totalDollarAmount.divide(cryptoCurrencyPrice, SCALE, RoundingMode.HALF_UP);
+        BigDecimal cryptoPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
+        BigDecimal dollarAmount = currencyConversion.convertRubleToDollar(rubleCount);
+        return dollarAmount.divide(cryptoPrice, SCALE, RoundingMode.HALF_UP);
     }
 
-    //TODO Задача 1.0 Переписать логику, тоже не верно
-    private void validateSufficientFunds(CryptoAccountDto cryptoAccountDto, BigDecimal rubleCount) {
-
-        if (cryptoAccountDto.getCurrencyCount().compareTo(rubleCount) < 0) {
-            throw new RuntimeException(INSUFFICIENT_FUNDS_MESSAGE);
+    private void validateSufficientFunds(CryptoAccountDto cryptoAccountDto, BigDecimal cryptoAmount)
+            throws InsufficientFundsException {
+        if (cryptoAccountDto.getCurrencyCount().compareTo(cryptoAmount) < 0) {
+            throw new InsufficientFundsException(INSUFFICIENT_FUNDS_MESSAGE);
         }
     }
 
-    private void updateAccountBalanceAfterWithdrawal(CryptoAccountDto cryptoAccountDto, BigDecimal cryptoAmount) {
-        cryptoAccountDto.setCurrencyCount(cryptoAccountDto.getCurrencyCount().subtract(cryptoAmount));
+    private void replenishAccountBalance(CryptoAccountDto cryptoAccountDto, BigDecimal dollarAmount)
+            throws CryptoAccountNotFoundException {
+        CryptoAccount cryptoAccount = cryptoAccountRepository.findByUuid(cryptoAccountDto.getUuid());
+        cryptoAccount.setCurrencyCount(cryptoAccount.getCurrencyCount().add(dollarAmount));
+    }
+
+    private void decreaseAccountBalance(CryptoAccountDto cryptoAccountDto, BigDecimal cryptoAmount)
+            throws CryptoAccountNotFoundException, InsufficientFundsException {
+        validateSufficientFunds(cryptoAccountDto, cryptoAmount);
+        CryptoAccount cryptoAccount = cryptoAccountRepository.findByUuid(cryptoAccountDto.getUuid());
+        cryptoAccount.setCurrencyCount(cryptoAccount.getCurrencyCount().subtract(cryptoAmount));
     }
 
 }

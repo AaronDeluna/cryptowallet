@@ -17,7 +17,7 @@ public class UserService {
     private final UserStorageRepository userStorageRepository;
     private final UserMapper userMapper;
 
-    public void save(UserDto userDto) {
+    public void save(UserDto userDto) throws RuntimeException {
         User user = userMapper.convertToEntity(userDto);
         userStorageRepository.save(user);
     }

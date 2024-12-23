@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.RefillRequestDto;
 import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
+import org.javaacademy.cryptowallet.exception.InsufficientFundsException;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
 import org.javaacademy.cryptowallet.service.crypto.CryptoAccountService;
 import org.springframework.cache.annotation.CacheEvict;
@@ -67,9 +68,8 @@ public class CryptoAccountController {
         try {
             return ResponseEntity.ok().body(cryptoAccountService.withdrawRublesFromAccount(
                     refillRequestDto.getAccountId(), refillRequestDto.getRubleAmount()));
-        } catch (IOException | CryptoAccountNotFoundException e) {
-            return ResponseEntity.badRequest()
-                    .body("Ошибка при попытке снятия рублей со счета: %s".formatted(e.getMessage()));
+        } catch (IOException | CryptoAccountNotFoundException | InsufficientFundsException e) {
+            return ResponseEntity.badRequest().body("Ошибка: %s".formatted(e.getMessage()));
         }
     }
 
@@ -79,8 +79,7 @@ public class CryptoAccountController {
         try {
             return ResponseEntity.ok().body(cryptoAccountService.showAccountBalanceInRublesById(id));
         } catch (IOException | CryptoAccountNotFoundException e) {
-            return ResponseEntity.badRequest()
-                    .body("Ошибка при попытке показать баланс крипто кошелька по id: %s".formatted(e.getMessage()));
+            return ResponseEntity.badRequest().body("Ошибка: %s".formatted(e.getMessage()));
         }
     }
 

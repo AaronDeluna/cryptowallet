@@ -13,10 +13,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserStorageRepository {
     private static final String USER_LOGIN_IS_EXIST = "Ошибка: пользователь с логином '%s' уже зарегистрирован.";
-    private static final String LOGIN_NOTFOUND = "Пользователь с login: %s не найден!";
+    private static final String LOGIN_NOTFOUND = "Ошибка: Пользователь с login: %s не найден!";
     private final UserStorage userStorage;
 
-    public void save(User user) {
+    public void save(User user) throws RuntimeException {
         if (getStorage().containsKey(user.getLogin())) {
             throw new RuntimeException(USER_LOGIN_IS_EXIST.formatted(user.getLogin()));
         }

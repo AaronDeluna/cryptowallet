@@ -7,6 +7,7 @@ import org.javaacademy.cryptowallet.storage.CryptoAccountStorage;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,7 +19,7 @@ import static java.math.BigDecimal.ZERO;
 @RequiredArgsConstructor
 public class CryptoAccountRepository {
     private static final String CRYPTO_ACCOUNT_ID_EXIST = "Ошибка: счет с таким id '%s' уже существует";
-    private static final String CRYPTO_ACCOUNT_ID_NOTFOUND = "Ошибка: счета с id '%s' не найден";
+    private static final String CRYPTO_ACCOUNT_ID_NOTFOUND = "Счет с id '%s' не найден";
     private final CryptoAccountStorage cryptoAccountStorage;
 
     public void save(CryptoAccount cryptoAccount) {
@@ -43,11 +44,6 @@ public class CryptoAccountRepository {
         return getStorage().values().stream()
                 .filter(cryptoAccount -> cryptoAccount.getUserLogin().equals(userLogin))
                 .toList();
-    }
-
-    public void updateBalanceByUuid(UUID uuid, BigDecimal updateCryptoBalance) throws CryptoAccountNotFoundException {
-        CryptoAccount cryptoAccount = findByUuid(uuid);
-        cryptoAccount.setCurrencyCount(cryptoAccount.getCurrencyCount().add(updateCryptoBalance));
     }
 
     private Map<UUID, CryptoAccount> getStorage() {
