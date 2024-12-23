@@ -1,6 +1,7 @@
 package org.javaacademy.cryptowallet.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.RefillRequestDto;
 import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
@@ -29,7 +30,8 @@ import java.util.UUID;
 public class CryptoAccountController {
     private final CryptoAccountService cryptoAccountService;
 
-    @GetMapping()
+    @GetMapping
+    @CacheEvict(value = "cryptoAccount")
     public ResponseEntity<?> getAllCryptoAccountByUserLogin(
             @RequestParam(name = "user_login") String userLogin) {
         if (cryptoAccountService.getAllCryptoAccountByUserLogin(userLogin).isEmpty()) {
@@ -39,6 +41,7 @@ public class CryptoAccountController {
     }
 
     @PostMapping
+    @CacheEvict(value = "cryptoAccount", allEntries = true)
     public ResponseEntity<?> createCryptoAccount(@RequestBody CreateCryptoAccountDto cryptoAccountDto) {
         try {
             UUID uuid = cryptoAccountService.createCryptoAccount(cryptoAccountDto);
@@ -58,7 +61,7 @@ public class CryptoAccountController {
             return ResponseEntity.ok().build();
         } catch (IOException | CryptoAccountNotFoundException e) {
             return ResponseEntity.badRequest()
-                    .body("Ошибка при пополнении кошелька: %s".formatted(e.getMessage()));
+                    .body("Ошибка: %s".formatted(e.getMessage()));
         }
     }
 
@@ -83,9 +86,11 @@ public class CryptoAccountController {
         }
     }
 
+    @SneakyThrows
     @GetMapping("/balance/user/{login}")
     @Cacheable(value = "cryptoAccount")
     public ResponseEntity<?> showAllAccountBalanceInRublesByUserLogin(@PathVariable String login) {
+        Thread.sleep(5000);
         return ResponseEntity.ok().body(cryptoAccountService.showAllAccountBalanceInRublesByUserLogin(login));
     }
 }
