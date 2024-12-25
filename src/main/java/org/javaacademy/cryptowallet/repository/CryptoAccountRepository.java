@@ -2,6 +2,7 @@ package org.javaacademy.cryptowallet.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
+import org.javaacademy.cryptowallet.exception.CryptoAccountIdExistException;
 import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
 import org.javaacademy.cryptowallet.storage.CryptoAccountStorage;
 import org.springframework.stereotype.Component;
@@ -20,11 +21,11 @@ public class CryptoAccountRepository {
     private static final String CRYPTO_ACCOUNT_ID_NOTFOUND = "Счет с id '%s' не найден";
     private final CryptoAccountStorage cryptoAccountStorage;
 
-    public void save(CryptoAccount cryptoAccount) {
+    public void save(CryptoAccount cryptoAccount) throws CryptoAccountIdExistException {
         cryptoAccount.setUuid(UUID.randomUUID());
         cryptoAccount.setCurrencyCount(ZERO);
         if (getStorage().containsKey(cryptoAccount.getUuid())) {
-            throw new RuntimeException(
+            throw new CryptoAccountIdExistException(
                     CRYPTO_ACCOUNT_ID_EXIST.formatted(cryptoAccount.getUuid())
             );
         }
@@ -38,6 +39,7 @@ public class CryptoAccountRepository {
                 );
     }
 
+    //TODO Сделать нормальный проброс исключенией елси пользователь не найден
     public List<CryptoAccount> findAllByUserLogin(String userLogin) {
         return getStorage().values().stream()
                 .filter(cryptoAccount -> cryptoAccount.getUserLogin().equals(userLogin))

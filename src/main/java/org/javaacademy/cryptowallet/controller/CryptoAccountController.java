@@ -8,10 +8,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.RefillRequestDto;
+import org.javaacademy.cryptowallet.exception.CryptoAccountIdExistException;
 import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
 import org.javaacademy.cryptowallet.exception.InsufficientFundsException;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
@@ -74,7 +74,7 @@ public class CryptoAccountController {
         try {
             UUID uuid = cryptoAccountService.createCryptoAccount(cryptoAccountDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(uuid);
-        } catch (UserNotFoundException e) {
+        } catch (UserNotFoundException | CryptoAccountIdExistException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -139,12 +139,16 @@ public class CryptoAccountController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Успешно", content = {
                     @Content(mediaType = "plain/text", schema = @Schema(implementation = BigDecimal.class))
-            })
+            }),
+            @ApiResponse(responseCode = "400", description = "Произошла ошибка")
     })
-    @SneakyThrows
     @GetMapping("/balance/user/{login}")
     @Cacheable(value = "cryptoAccount")
     public ResponseEntity<?> showAllAccountBalanceInRublesByUserLogin(@PathVariable String login) {
-        return ResponseEntity.ok().body(cryptoAccountService.showAllAccountBalanceInRublesByUserLogin(login));
+        try {
+            return ResponseEntity.ok().body(cryptoAccountService.showAllAccountBalanceInRublesByUserLogin(login));
+        } catch (UserNotFoundException | IOException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

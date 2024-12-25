@@ -6,13 +6,14 @@ import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
 import org.javaacademy.cryptowallet.entity.CryptoCurrency;
+import org.javaacademy.cryptowallet.exception.CryptoAccountIdExistException;
 import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
 import org.javaacademy.cryptowallet.exception.InsufficientFundsException;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
 import org.javaacademy.cryptowallet.mapper.CryptoAccountMapper;
 import org.javaacademy.cryptowallet.repository.CryptoAccountRepository;
 import org.javaacademy.cryptowallet.repository.UserStorageRepository;
-import org.javaacademy.cryptowallet.service.currency_converter.CurrencyConversion;
+import org.javaacademy.cryptowallet.service.currency_converter.CurrencyConversionService;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,7 +21,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class CryptoAccountService {
     private final UserStorageRepository userStorageRepository;
     private final CryptoAccountMapper cryptoAccountMapper;
     private final CryptoPriceService cryptoPriceService;
-    private final CurrencyConversion currencyConversion;
+    private final CurrencyConversionService currencyConversionService;
 
     public List<CryptoAccountDto> getAllCryptoAccountByUserLogin(String userLogin) {
         return cryptoAccountRepository.findAllByUserLogin(userLogin).stream()
@@ -41,7 +41,8 @@ public class CryptoAccountService {
                 .toList();
     }
 
-    public UUID createCryptoAccount(CreateCryptoAccountDto createDto) throws UserNotFoundException {
+    public UUID createCryptoAccount(CreateCryptoAccountDto createDto)
+            throws UserNotFoundException, CryptoAccountIdExistException {
         userStorageRepository.findByLogin(createDto.getUserLogin());
         CryptoAccount cryptoAccount = cryptoAccountMapper.toEntity(createDto);
         cryptoAccountRepository.save(cryptoAccount);
@@ -69,11 +70,6 @@ public class CryptoAccountService {
 
     /**
      * Вернет оставшеся количество рублей на конкретном счету
-     *
-     * @param cryptoAccountId
-     * @return
-     * @throws CryptoAccountNotFoundException
-     * @throws IOException
      */
     public BigDecimal showAccountBalanceInRublesById(UUID cryptoAccountId)
             throws CryptoAccountNotFoundException, IOException {
@@ -85,37 +81,37 @@ public class CryptoAccountService {
 
     /**
      * Показывает остаток рублей на всех крипто кошельках
-     *
-     * @param userLogin
-     * @return
      */
-    public BigDecimal showAllAccountBalanceInRublesByUserLogin(String userLogin) {
-        AtomicReference<BigDecimal> totalRubleAmount = new AtomicReference<>(BigDecimal.ZERO);
+    public BigDecimal showAllAccountBalanceInRublesByUserLogin(String userLogin)
+            throws UserNotFoundException, IOException {
+        userStorageRepository.findByLogin(userLogin);
         List<CryptoAccountDto> cryptoAccountsDto = cryptoAccountMapper.toDtos(
                 cryptoAccountRepository.findAllByUserLogin(userLogin)
         );
-
-        cryptoAccountsDto.forEach(cryptoAccount ->
-                totalRubleAmount.set(totalRubleAmount.get().add(calculateRubleAmount(cryptoAccount)))
-        );
-
-        return totalRubleAmount.get();
-    }
-
-    private BigDecimal calculateRubleAmount(CryptoAccountDto cryptoAccountDto) {
-        try {
-            CryptoCurrency cryptoCurrency = cryptoAccountDto.getCurrency();
-            BigDecimal cryptoDollarPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
-            BigDecimal resultTotalDollar = cryptoAccountDto.getCurrencyCount().multiply(cryptoDollarPrice);
-            return currencyConversion.convertDollarToRubles(resultTotalDollar);
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+        BigDecimal totalRubleAmount = BigDecimal.ZERO;
+        for (CryptoAccountDto cryptoAccountDto : cryptoAccountsDto) {
+            totalRubleAmount = totalRubleAmount.add(calculateRubleAmount(cryptoAccountDto));
         }
+
+        return totalRubleAmount;
     }
 
+    /**
+     * Расчитывает рублевый эквивалент криптовалюты
+     */
+    private BigDecimal calculateRubleAmount(CryptoAccountDto cryptoAccountDto) throws IOException {
+        CryptoCurrency cryptoCurrency = cryptoAccountDto.getCurrency();
+        BigDecimal cryptoPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
+        BigDecimal dollarAmount = cryptoAccountDto.getCurrencyCount().multiply(cryptoPrice);
+        return currencyConversionService.convertDollarToRubles(dollarAmount);
+    }
+
+    /**
+     * Расчитывает криптовалютный эквивалент
+     */
     private BigDecimal calculateCryptoAmount(BigDecimal rubleCount, CryptoCurrency cryptoCurrency) throws IOException {
         BigDecimal cryptoPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
-        BigDecimal dollarAmount = currencyConversion.convertRubleToDollar(rubleCount);
+        BigDecimal dollarAmount = currencyConversionService.convertRubleToDollar(rubleCount);
         return dollarAmount.divide(cryptoPrice, SCALE, RoundingMode.HALF_UP);
     }
 

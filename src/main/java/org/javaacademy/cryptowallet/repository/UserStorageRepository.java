@@ -1,6 +1,7 @@
 package org.javaacademy.cryptowallet.repository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.javaacademy.cryptowallet.entity.User;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
 import org.javaacademy.cryptowallet.storage.UserStorage;
@@ -11,6 +12,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class UserStorageRepository {
     private static final String USER_LOGIN_IS_EXIST = "Ошибка: пользователь с логином '%s' уже зарегистрирован.";
     private static final String LOGIN_NOTFOUND = "Ошибка: Пользователь с login: %s не найден!";

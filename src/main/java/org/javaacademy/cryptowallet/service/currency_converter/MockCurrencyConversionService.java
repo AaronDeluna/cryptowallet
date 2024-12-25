@@ -9,7 +9,7 @@ import java.math.RoundingMode;
 
 @Service
 @Profile("local")
-public class MockCurrencyConversionService implements CurrencyConversion {
+public class MockCurrencyConversionService implements CurrencyConversionService {
     private static final int SCALE = 2;
     @Value("${test-data.dollar.rate}")
     private BigDecimal dollarRate;

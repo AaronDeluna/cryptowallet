@@ -16,7 +16,7 @@ import java.math.RoundingMode;
 @Service
 @Profile("prod")
 @RequiredArgsConstructor
-public class CurrencyConversionServiceImpl implements CurrencyConversion {
+public class CurrencyConversionServiceImpl implements CurrencyConversionService {
     private static final String INVALID_RESPONSE_ERROR = "Ошибка: Запрос не выполнен успешно или тело ответа пустое.";
     private static final String DOLLAR_RATE_JSON_PATH = "$.rates.USD";
     private static final int SCALE = 2;
