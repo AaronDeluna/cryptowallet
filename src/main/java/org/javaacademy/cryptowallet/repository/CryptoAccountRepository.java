@@ -39,7 +39,6 @@ public class CryptoAccountRepository {
                 );
     }
 
-    //TODO Сделать нормальный проброс исключенией елси пользователь не найден
     public List<CryptoAccount> findAllByUserLogin(String userLogin) {
         return getStorage().values().stream()
                 .filter(cryptoAccount -> cryptoAccount.getUserLogin().equals(userLogin))

@@ -17,6 +17,15 @@ public class CryptoAccountMapper {
         );
     }
 
+    public CryptoAccount toEntity(CryptoAccountDto dto) {
+        return new CryptoAccount(
+                dto.getUuid(),
+                dto.getUserLogin(),
+                dto.getCurrency(),
+                dto.getCurrencyCount()
+        );
+    }
+
     public CryptoAccountDto toDto(CryptoAccount cryptoAccount) {
         return new CryptoAccountDto(
                 cryptoAccount.getUuid(),

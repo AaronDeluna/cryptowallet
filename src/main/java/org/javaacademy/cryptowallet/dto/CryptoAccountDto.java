@@ -2,7 +2,9 @@ package org.javaacademy.cryptowallet.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 
@@ -11,7 +13,9 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode
 @NoArgsConstructor
+@Builder
 public class CryptoAccountDto {
     @Schema(description = "Уникальный id")
     private UUID uuid;

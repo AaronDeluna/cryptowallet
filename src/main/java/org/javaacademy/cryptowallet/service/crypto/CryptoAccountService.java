@@ -42,8 +42,7 @@ public class CryptoAccountService {
     }
 
     public UUID createCryptoAccount(CreateCryptoAccountDto createDto)
-            throws UserNotFoundException, CryptoAccountIdExistException {
-        userStorageRepository.findByLogin(createDto.getUserLogin());
+            throws CryptoAccountIdExistException {
         CryptoAccount cryptoAccount = cryptoAccountMapper.toEntity(createDto);
         cryptoAccountRepository.save(cryptoAccount);
         return cryptoAccount.getUuid();

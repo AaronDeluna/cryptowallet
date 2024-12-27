@@ -74,7 +74,7 @@ public class CryptoAccountController {
         try {
             UUID uuid = cryptoAccountService.createCryptoAccount(cryptoAccountDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(uuid);
-        } catch (UserNotFoundException | CryptoAccountIdExistException e) {
+        } catch (CryptoAccountIdExistException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -34,6 +34,7 @@ public class UserController {
         try {
             userService.save(userDto);
             return ResponseEntity.status(HttpStatus.CREATED).build();
+            //TODO убрать RuntimeException, заменить на кастомное исключение
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

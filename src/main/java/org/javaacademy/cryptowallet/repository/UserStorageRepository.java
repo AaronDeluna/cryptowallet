@@ -18,6 +18,7 @@ public class UserStorageRepository {
     private static final String LOGIN_NOTFOUND = "Ошибка: Пользователь с login: %s не найден!";
     private final UserStorage userStorage;
 
+    //TODO испраивть на кастомный проброс ошибки
     public void save(User user) throws RuntimeException {
         if (getStorage().containsKey(user.getLogin())) {
             throw new RuntimeException(USER_LOGIN_IS_EXIST.formatted(user.getLogin()));
