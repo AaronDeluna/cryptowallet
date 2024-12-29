@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
+import org.javaacademy.cryptowallet.dto.RefillRequestDto;
+import org.javaacademy.cryptowallet.dto.WithdrawalRequestDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
 import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 import org.javaacademy.cryptowallet.exception.CryptoAccountIdExistException;
@@ -48,21 +50,25 @@ public class CryptoAccountService {
         return cryptoAccount.getUuid();
     }
 
-    public void replenishAccountInRubles(UUID cryptoAccountId, BigDecimal rubleCount)
+    public void replenishAccountInRubles(RefillRequestDto refillRequestDto)
             throws IOException, CryptoAccountNotFoundException {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
-                cryptoAccountRepository.findByUuid(cryptoAccountId)
+                cryptoAccountRepository.findByUuid(refillRequestDto.getAccountId())
         );
-        BigDecimal cryptoAmount = calculateCryptoAmount(rubleCount, cryptoAccountDto.getCurrency());
+        BigDecimal cryptoAmount = calculateCryptoAmount(
+                refillRequestDto.getRubleAmount(), cryptoAccountDto.getCurrency()
+        );
         replenishAccountBalance(cryptoAccountDto, cryptoAmount);
     }
 
-    public String withdrawRublesFromAccount(UUID cryptoAccountId, BigDecimal rubleCount)
+    public String withdrawRublesFromAccount(WithdrawalRequestDto withdrawalRequestDto)
             throws CryptoAccountNotFoundException, IOException, InsufficientFundsException {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
-                cryptoAccountRepository.findByUuid(cryptoAccountId)
+                cryptoAccountRepository.findByUuid(withdrawalRequestDto.getAccountId())
         );
-        BigDecimal cryptoAmount = calculateCryptoAmount(rubleCount, cryptoAccountDto.getCurrency());
+        BigDecimal cryptoAmount = calculateCryptoAmount(
+                withdrawalRequestDto.getRubleAmount(), cryptoAccountDto.getCurrency()
+        );
         decreaseAccountBalance(cryptoAccountDto, cryptoAmount);
         return OPERATION_SUCCESS_SOLD_MESSAGE.formatted(cryptoAmount);
     }

@@ -24,7 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@DisplayName("Пользовательский контроллер")
+@DisplayName("Тест пользовательского контроллера")
 @ActiveProfiles("local")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @AutoConfigureMockMvc
@@ -107,9 +107,9 @@ public class UserControllerTest {
                 .spec(responseSpecification)
                 .statusCode(200);
 
-        String expectedPassword = "5555";
+        String expectedNewPassword = "5555";
         String resultPassword = userStorageRepository.findByLogin(resetUserPasswordDto.getLogin()).getPassword();
-        assertEquals(expectedPassword, resultPassword);
+        assertEquals(expectedNewPassword, resultPassword);
     }
 
     @Test

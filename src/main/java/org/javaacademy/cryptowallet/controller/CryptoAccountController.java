@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.RefillRequestDto;
+import org.javaacademy.cryptowallet.dto.WithdrawalRequestDto;
 import org.javaacademy.cryptowallet.exception.CryptoAccountIdExistException;
 import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
 import org.javaacademy.cryptowallet.exception.InsufficientFundsException;
@@ -88,10 +89,9 @@ public class CryptoAccountController {
     @CacheEvict(value = "cryptoAccount", allEntries = true)
     public ResponseEntity<?> replenishAccountInRubles(@RequestBody RefillRequestDto refillRequestDto) {
         try {
-            cryptoAccountService.replenishAccountInRubles(
-                    refillRequestDto.getAccountId(), refillRequestDto.getRubleAmount()
-            );
+            cryptoAccountService.replenishAccountInRubles(refillRequestDto);
             return ResponseEntity.ok().build();
+            //TODO Погуглить, надо ли IOException пробрасывать на слой контроллера
         } catch (IOException | CryptoAccountNotFoundException e) {
             return ResponseEntity.badRequest()
                     .body("Ошибка: %s".formatted(e.getMessage()));
@@ -107,10 +107,9 @@ public class CryptoAccountController {
     })
     @PostMapping("/withdrawal")
     @CacheEvict(value = "cryptoAccount", allEntries = true)
-    public ResponseEntity<?> withdrawRublesFromAccount(@RequestBody RefillRequestDto refillRequestDto) {
+    public ResponseEntity<?> withdrawRublesFromAccount(@RequestBody WithdrawalRequestDto withdrawalRequestDto) {
         try {
-            return ResponseEntity.ok().body(cryptoAccountService.withdrawRublesFromAccount(
-                    refillRequestDto.getAccountId(), refillRequestDto.getRubleAmount()));
+            return ResponseEntity.ok().body(cryptoAccountService.withdrawRublesFromAccount(withdrawalRequestDto));
         } catch (IOException | CryptoAccountNotFoundException | InsufficientFundsException e) {
             return ResponseEntity.badRequest().body("Ошибка: %s".formatted(e.getMessage()));
         }

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class RefillRequestDto {
+public class WithdrawalRequestDto {
     @Schema(description = "id крипто счета")
     @JsonProperty("account_id")
     private UUID accountId;
