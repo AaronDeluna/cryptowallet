@@ -3,6 +3,7 @@ package org.javaacademy.cryptowallet.repository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.javaacademy.cryptowallet.entity.User;
+import org.javaacademy.cryptowallet.exception.UserLoginAlreadyExistsException;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
 import org.javaacademy.cryptowallet.storage.UserStorage;
 import org.springframework.stereotype.Component;
@@ -18,10 +19,9 @@ public class UserStorageRepository {
     private static final String LOGIN_NOTFOUND = "Ошибка: Пользователь с login: %s не найден!";
     private final UserStorage userStorage;
 
-    //TODO испраивть на кастомный проброс ошибки
-    public void save(User user) throws RuntimeException {
+    public void save(User user) throws UserLoginAlreadyExistsException {
         if (getStorage().containsKey(user.getLogin())) {
-            throw new RuntimeException(USER_LOGIN_IS_EXIST.formatted(user.getLogin()));
+            throw new UserLoginAlreadyExistsException(USER_LOGIN_IS_EXIST.formatted(user.getLogin()));
         }
         getStorage().put(user.getLogin(), user);
     }

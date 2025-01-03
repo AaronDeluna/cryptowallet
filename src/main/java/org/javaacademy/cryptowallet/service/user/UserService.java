@@ -5,6 +5,7 @@ import org.javaacademy.cryptowallet.dto.ResetUserPasswordDto;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.entity.User;
 import org.javaacademy.cryptowallet.exception.InvalidPasswordException;
+import org.javaacademy.cryptowallet.exception.UserLoginAlreadyExistsException;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
 import org.javaacademy.cryptowallet.mapper.UserMapper;
 import org.javaacademy.cryptowallet.repository.UserStorageRepository;
@@ -17,7 +18,7 @@ public class UserService {
     private final UserStorageRepository userStorageRepository;
     private final UserMapper userMapper;
 
-    public void save(UserDto userDto) throws RuntimeException {
+    public void save(UserDto userDto) throws UserLoginAlreadyExistsException {
         User user = userMapper.convertToEntity(userDto);
         userStorageRepository.save(user);
     }

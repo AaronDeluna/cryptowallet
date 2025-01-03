@@ -205,4 +205,6 @@ public class CryptoAccountControllerTest {
         assertEquals(0, resultCurrencyCount);
     }
 
+    //TODO Дописать тесты на отсальные ендпоинты
+
 }

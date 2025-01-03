@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.dto.ResetUserPasswordDto;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.exception.InvalidPasswordException;
+import org.javaacademy.cryptowallet.exception.UserLoginAlreadyExistsException;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
 import org.javaacademy.cryptowallet.service.user.UserService;
 import org.springframework.http.HttpStatus;
@@ -34,8 +35,7 @@ public class UserController {
         try {
             userService.save(userDto);
             return ResponseEntity.status(HttpStatus.CREATED).build();
-            //TODO убрать RuntimeException, заменить на кастомное исключение
-        } catch (RuntimeException e) {
+        } catch (UserLoginAlreadyExistsException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
