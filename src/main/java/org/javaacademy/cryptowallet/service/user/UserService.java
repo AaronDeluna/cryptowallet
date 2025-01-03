@@ -19,7 +19,7 @@ public class UserService {
     private final UserMapper userMapper;
 
     public void save(UserDto userDto) throws UserLoginAlreadyExistsException {
-        User user = userMapper.convertToEntity(userDto);
+        User user = userMapper.toEntity(userDto);
         userStorageRepository.save(user);
     }
 

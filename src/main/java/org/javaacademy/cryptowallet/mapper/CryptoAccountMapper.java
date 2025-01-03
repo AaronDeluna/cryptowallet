@@ -17,31 +17,23 @@ public class CryptoAccountMapper {
         );
     }
 
-    public CryptoAccount toEntity(CryptoAccountDto dto) {
-        return new CryptoAccount(
-                dto.getUuid(),
-                dto.getUserLogin(),
-                dto.getCurrency(),
-                dto.getCurrencyCount()
-        );
-    }
-
     public CryptoAccountDto toDto(CryptoAccount cryptoAccount) {
-        return new CryptoAccountDto(
-                cryptoAccount.getUuid(),
-                cryptoAccount.getUserLogin(),
-                cryptoAccount.getCurrency(),
-                cryptoAccount.getCurrencyCount()
-        );
+        return CryptoAccountDto.builder()
+                .uuid(cryptoAccount.getUuid())
+                .userLogin(cryptoAccount.getUserLogin())
+                .currency(cryptoAccount.getCurrency())
+                .currencyCount(cryptoAccount.getCurrencyCount())
+                .build();
     }
 
     public List<CryptoAccountDto> toDtos(List<CryptoAccount> cryptoAccounts) {
-        return cryptoAccounts.stream().map(cryptoAccount ->
-                        new CryptoAccountDto(
-                                cryptoAccount.getUuid(),
-                                cryptoAccount.getUserLogin(),
-                                cryptoAccount.getCurrency(),
-                                cryptoAccount.getCurrencyCount()))
+        return cryptoAccounts.stream()
+                .map(cryptoAccount -> CryptoAccountDto.builder()
+                        .uuid(cryptoAccount.getUuid())
+                        .userLogin(cryptoAccount.getUserLogin())
+                        .currency(cryptoAccount.getCurrency())
+                        .currencyCount(cryptoAccount.getCurrencyCount())
+                        .build())
                 .toList();
     }
 }

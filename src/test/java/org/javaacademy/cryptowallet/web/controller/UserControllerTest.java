@@ -8,11 +8,9 @@ import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.javaacademy.cryptowallet.dto.ResetUserPasswordDto;
 import org.javaacademy.cryptowallet.dto.UserDto;
-import org.javaacademy.cryptowallet.entity.User;
 import org.javaacademy.cryptowallet.mapper.UserMapper;
 import org.javaacademy.cryptowallet.repository.UserStorageRepository;
 import org.javaacademy.cryptowallet.service.user.UserService;
-import org.javaacademy.cryptowallet.storage.UserStorage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +59,7 @@ public class UserControllerTest {
                 .spec(responseSpecification)
                 .statusCode(201);
 
-        UserDto resultUserDto = userMapper.convertToDto(
+        UserDto resultUserDto = userMapper.toDto(
                 userStorageRepository.findByLogin(expectedUserDto.getUserLogin())
         );
         assertEquals(expectedUserDto, resultUserDto);
