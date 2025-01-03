@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidPasswordException.class)
-    public ResponseEntity<ErrorMessage> InvalidPasswordException(InvalidPasswordException e) {
+    public ResponseEntity<ErrorMessage> invalidPasswordException(InvalidPasswordException e) {
         return ResponseEntity
                 .badRequest()
                 .body(new ErrorMessage(e.getMessage()));

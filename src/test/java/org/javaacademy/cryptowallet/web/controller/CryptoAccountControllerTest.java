@@ -11,12 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.RefillRequestDto;
+import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.dto.WithdrawalRequestDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
 import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 import org.javaacademy.cryptowallet.mapper.CryptoAccountMapper;
-import org.javaacademy.cryptowallet.repository.CryptoAccountRepository;
 import org.javaacademy.cryptowallet.service.crypto.CryptoAccountService;
+import org.javaacademy.cryptowallet.service.user.UserService;
 import org.javaacademy.cryptowallet.storage.CryptoAccountStorage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ public class CryptoAccountControllerTest {
     @Autowired
     private CryptoAccountService cryptoAccountService;
     @Autowired
-    private CryptoAccountRepository cryptoAccountRepository;
+    private UserService userService;
     @Autowired
     private CryptoAccountStorage cryptoAccountStorage;
     @Autowired
@@ -205,6 +206,126 @@ public class CryptoAccountControllerTest {
         assertEquals(0, resultCurrencyCount);
     }
 
-    //TODO Дописать тесты на отсальные ендпоинты
+    @Test
+    @DisplayName("Успешное возвращение статуса 400, при попытке снять средства с несуществующего крипто-счет по id")
+    public void shouldReturnBadRequestWhenCryptoAccountDoesNotExistForWithdrawalById() {
+        WithdrawalRequestDto withdrawalRequestDto = WithdrawalRequestDto.builder()
+                .accountId(UUID.randomUUID())
+                .rubleAmount(valueOf(100))
+                .build();
 
+        given(requestSpecification)
+                .body(withdrawalRequestDto)
+                .post("/withdrawal")
+                .then()
+                .spec(responseSpecification)
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("Успешное возвращение статуса 400, в случае проведения операции с некорректной суммой на аккаунте")
+    public void shouldReturnBadRequestWhenAmountIsInvalidForOperationOnAccount() {
+        CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
+                .userLogin("Anton")
+                .currency(BTC)
+                .build();
+
+        UUID cryptoAccountId = cryptoAccountService.createCryptoAccount(createCryptoAccountDto);
+        CryptoAccount cryptoAccount = cryptoAccountStorage.getCryptoStorage().get(cryptoAccountId);
+        cryptoAccount.setCurrencyCount(valueOf(1));
+
+        WithdrawalRequestDto withdrawalRequestDto = WithdrawalRequestDto.builder()
+                .accountId(cryptoAccountId)
+                .rubleAmount(valueOf(1000))
+                .build();
+
+        given(requestSpecification)
+                .body(withdrawalRequestDto)
+                .post("/withdrawal")
+                .then()
+                .spec(responseSpecification)
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("Успешно показывает рублевый эквивалент криптосчета по id")
+    public void showAccountBalanceInRublesByIdSuccess() {
+        CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
+                .userLogin("Anton")
+                .currency(BTC)
+                .build();
+
+        UUID cryptoAccountId = cryptoAccountService.createCryptoAccount(createCryptoAccountDto);
+        CryptoAccount cryptoAccount = cryptoAccountStorage.getCryptoStorage().get(cryptoAccountId);
+        cryptoAccount.setCurrencyCount(valueOf(1));
+
+        BigDecimal resultRubleAmount = given(requestSpecification)
+                .get("/balance/%s".formatted(cryptoAccountId))
+                .then()
+                .spec(responseSpecification)
+                .statusCode(200)
+                .extract()
+                .as(BigDecimal.class);
+
+        BigDecimal expectedRubleAmount = valueOf(100);
+        assertEquals(0, expectedRubleAmount.compareTo(resultRubleAmount));
+    }
+
+    @Test
+    @DisplayName("Успешное возвращение статуса 400, в случае если запрашивашивается"
+            + " рублевый эквивалет у несуществующего аккаунта")
+    public void shouldReturnBadRequestWhenRequestingBalanceForNonExistentAccount() {
+        UUID cryptoAccountId = UUID.randomUUID();
+        given(requestSpecification)
+                .get("/balance/%s".formatted(cryptoAccountId))
+                .then()
+                .spec(responseSpecification)
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("Успешно показывает рублевый эквивалент всех крипто счетов")
+    public void showAllAccountBalanceInRublesByUserLogin() {
+        String expectedLogin = "Anton";
+
+        userService.save(UserDto.builder()
+                .userLogin(expectedLogin)
+                .email("aa@mail.ru")
+                .password("1234")
+                .build()
+        );
+
+        CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
+                .userLogin(expectedLogin)
+                .currency(BTC)
+                .build();
+
+        for (int i = 0; i < 2; i++) {
+            UUID cryptoAccountId = cryptoAccountService.createCryptoAccount(createCryptoAccountDto);
+            CryptoAccount cryptoAccount = cryptoAccountStorage.getCryptoStorage().get(cryptoAccountId);
+            cryptoAccount.setCurrencyCount(valueOf(1));
+        }
+
+        BigDecimal resultRubleAmount = given(requestSpecification)
+                .get("/balance/user/%s".formatted(expectedLogin))
+                .then()
+                .spec(responseSpecification)
+                .statusCode(200)
+                .extract()
+                .as(BigDecimal.class);
+
+        BigDecimal expectedRubleAmount = valueOf(200);
+        assertEquals(0, expectedRubleAmount.compareTo(resultRubleAmount));
+    }
+
+    @Test
+    @DisplayName("Успешное возвращение статуса 400, если при запросе эквивалента всех "
+            + "криптокошельков указанный логин не существует.")
+    public void shouldReturnBadRequestWhenLoginDoesNotExist() {
+        given(requestSpecification)
+                .get("/balance/user/%s".formatted("Dima"))
+                .then()
+                .spec(responseSpecification)
+                .statusCode(400);
+    }
 }
