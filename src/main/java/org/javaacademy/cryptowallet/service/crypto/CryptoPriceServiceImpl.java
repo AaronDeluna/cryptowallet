@@ -6,6 +6,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.javaacademy.cryptowallet.entity.CryptoCurrency;
+import org.javaacademy.cryptowallet.exception.CryptoPriceRetrievalException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -27,14 +28,16 @@ public class CryptoPriceServiceImpl implements CryptoPriceService {
     private final OkHttpClient client;
 
     @Override
-    public BigDecimal getCryptoPriceByCurrency(CryptoCurrency currency) throws IOException {
+    public BigDecimal getCryptoPriceByCurrency(CryptoCurrency currency) throws CryptoPriceRetrievalException {
         Request request = buildRequest(currency);
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
-                throw new RuntimeException(INVALID_RESPONSE_ERROR);
+                throw new CryptoPriceRetrievalException(INVALID_RESPONSE_ERROR);
             }
             return extractPriceFromResponse(response.body().string(), currency);
+        } catch (IOException e) {
+            throw new CryptoPriceRetrievalException(e);
         }
     }
 

@@ -67,6 +67,8 @@ public class CryptoAccountControllerTest {
     public void getAllCryptoAccountByUserLoginSuccess() {
         String expectedName = "Anton";
 
+        createTestUser(expectedName);
+
         UUID expectedUuid = cryptoAccountService.createCryptoAccount(CreateCryptoAccountDto.builder()
                 .userLogin(expectedName)
                 .currency(BTC)
@@ -88,7 +90,8 @@ public class CryptoAccountControllerTest {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(new TypeRef<>() {});
+                .as(new TypeRef<>() {
+                });
 
         int expectedSize = 1;
         int resultSize = cryptoAccountDtos.size();
@@ -103,6 +106,8 @@ public class CryptoAccountControllerTest {
     public void createCryptoAccountSuccess() {
         String expectedUserLogin = "Anton";
         CryptoCurrency expectedCryptoCurrency = BTC;
+
+        createTestUser(expectedUserLogin);
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
                 .userLogin(expectedUserLogin)
@@ -124,7 +129,7 @@ public class CryptoAccountControllerTest {
 
         String resultUserLogin = resultCryptoAccountDto.getUserLogin();
         CryptoCurrency resultCryptoCurrency = resultCryptoAccountDto.getCurrency();
-        int resultCurrencyCount =  ZERO.compareTo(resultCryptoAccountDto.getCurrencyCount());
+        int resultCurrencyCount = ZERO.compareTo(resultCryptoAccountDto.getCurrencyCount());
 
         assertEquals(expectedUserLogin, resultUserLogin);
         assertEquals(expectedCryptoCurrency, resultCryptoCurrency);
@@ -136,6 +141,8 @@ public class CryptoAccountControllerTest {
     @DisplayName("Успешное пополнение крипто-счета, рублями")
     public void replenishAccountInRublesSuccess() {
         String expectedUserLogin = "Anton";
+
+        createTestUser(expectedUserLogin);
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
                 .userLogin(expectedUserLogin)
@@ -181,8 +188,12 @@ public class CryptoAccountControllerTest {
     @Test
     @DisplayName("Успешное снятие средств с крипто-счет по id")
     public void withdrawRublesFromAccountSuccess() {
+        String expectedUserLogin = "Anton";
+
+        createTestUser(expectedUserLogin);
+
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
-                .userLogin("Anton")
+                .userLogin(expectedUserLogin)
                 .currency(BTC)
                 .build();
 
@@ -225,8 +236,12 @@ public class CryptoAccountControllerTest {
     @Test
     @DisplayName("Успешное возвращение статуса 400, в случае проведения операции с некорректной суммой на аккаунте")
     public void shouldReturnBadRequestWhenAmountIsInvalidForOperationOnAccount() {
+        String expectedLogin = "Anton";
+
+        createTestUser(expectedLogin);
+
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
-                .userLogin("Anton")
+                .userLogin(expectedLogin)
                 .currency(BTC)
                 .build();
 
@@ -250,8 +265,12 @@ public class CryptoAccountControllerTest {
     @Test
     @DisplayName("Успешно показывает рублевый эквивалент криптосчета по id")
     public void showAccountBalanceInRublesByIdSuccess() {
+        String expectedLogin = "Anton";
+
+        createTestUser(expectedLogin);
+
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
-                .userLogin("Anton")
+                .userLogin(expectedLogin)
                 .currency(BTC)
                 .build();
 
@@ -288,12 +307,7 @@ public class CryptoAccountControllerTest {
     public void showAllAccountBalanceInRublesByUserLogin() {
         String expectedLogin = "Anton";
 
-        userService.save(UserDto.builder()
-                .userLogin(expectedLogin)
-                .email("aa@mail.ru")
-                .password("1234")
-                .build()
-        );
+        createTestUser(expectedLogin);
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
                 .userLogin(expectedLogin)
@@ -327,5 +341,14 @@ public class CryptoAccountControllerTest {
                 .then()
                 .spec(responseSpecification)
                 .statusCode(400);
+    }
+
+    private void createTestUser(String name) {
+        userService.save(UserDto.builder()
+                .userLogin(name)
+                .email("aa@mail.ru")
+                .password("1234")
+                .build()
+        );
     }
 }

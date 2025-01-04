@@ -12,10 +12,6 @@ import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.RefillRequestDto;
 import org.javaacademy.cryptowallet.dto.WithdrawalRequestDto;
-import org.javaacademy.cryptowallet.exception.CryptoAccountIdExistException;
-import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
-import org.javaacademy.cryptowallet.exception.InsufficientFundsException;
-import org.javaacademy.cryptowallet.exception.UserNotFoundException;
 import org.javaacademy.cryptowallet.service.crypto.CryptoAccountService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -72,12 +67,8 @@ public class CryptoAccountController {
     @PostMapping
     @CacheEvict(value = "cryptoAccount", allEntries = true)
     public ResponseEntity<?> createCryptoAccount(@RequestBody CreateCryptoAccountDto cryptoAccountDto) {
-        try {
-            UUID uuid = cryptoAccountService.createCryptoAccount(cryptoAccountDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(uuid);
-        } catch (CryptoAccountIdExistException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        UUID uuid = cryptoAccountService.createCryptoAccount(cryptoAccountDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(uuid);
     }
 
     @Operation(summary = "Пополнение счета в рублях", description = "Пополняет счет крипто-кошелька")
@@ -88,14 +79,8 @@ public class CryptoAccountController {
     @PostMapping("/refill")
     @CacheEvict(value = "cryptoAccount", allEntries = true)
     public ResponseEntity<?> replenishAccountInRubles(@RequestBody RefillRequestDto refillRequestDto) {
-        try {
-            cryptoAccountService.replenishAccountInRubles(refillRequestDto);
-            return ResponseEntity.ok().build();
-            //TODO Погуглить, надо ли IOException пробрасывать на слой контроллера
-        } catch (IOException | CryptoAccountNotFoundException e) {
-            return ResponseEntity.badRequest()
-                    .body("Ошибка: %s".formatted(e.getMessage()));
-        }
+        cryptoAccountService.replenishAccountInRubles(refillRequestDto);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Снятие рублей со счета", description = "Снимает рубли с счета крипто-кошелька")
@@ -108,11 +93,7 @@ public class CryptoAccountController {
     @PostMapping("/withdrawal")
     @CacheEvict(value = "cryptoAccount", allEntries = true)
     public ResponseEntity<?> withdrawRublesFromAccount(@RequestBody WithdrawalRequestDto withdrawalRequestDto) {
-        try {
-            return ResponseEntity.ok().body(cryptoAccountService.withdrawRublesFromAccount(withdrawalRequestDto));
-        } catch (IOException | CryptoAccountNotFoundException | InsufficientFundsException e) {
-            return ResponseEntity.badRequest().body("Ошибка: %s".formatted(e.getMessage()));
-        }
+        return ResponseEntity.ok().body(cryptoAccountService.withdrawRublesFromAccount(withdrawalRequestDto));
     }
 
     @Operation(summary = "Показывает рублевый эквивалент криптосчета по id",
@@ -126,11 +107,7 @@ public class CryptoAccountController {
     @GetMapping("/balance/{id}")
     @Cacheable(value = "cryptoAccount")
     public ResponseEntity<?> showAccountBalanceInRublesById(@PathVariable UUID id) {
-        try {
-            return ResponseEntity.ok().body(cryptoAccountService.showAccountBalanceInRublesById(id));
-        } catch (IOException | CryptoAccountNotFoundException e) {
-            return ResponseEntity.badRequest().body("Ошибка: %s".formatted(e.getMessage()));
-        }
+        return ResponseEntity.ok().body(cryptoAccountService.showAccountBalanceInRublesById(id));
     }
 
     @Operation(summary = "Показывает рублевый эквивалент всех крипто счетов",
@@ -144,10 +121,6 @@ public class CryptoAccountController {
     @GetMapping("/balance/user/{login}")
     @Cacheable(value = "cryptoAccount")
     public ResponseEntity<?> showAllAccountBalanceInRublesByUserLogin(@PathVariable String login) {
-        try {
-            return ResponseEntity.ok().body(cryptoAccountService.showAllAccountBalanceInRublesByUserLogin(login));
-        } catch (UserNotFoundException | IOException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok().body(cryptoAccountService.showAllAccountBalanceInRublesByUserLogin(login));
     }
 }

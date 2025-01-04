@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.javaacademy.cryptowallet.exception.CurrencyConversionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -25,24 +26,26 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService 
     private final OkHttpClient client;
 
     @Override
-    public BigDecimal convertDollarToRubles(BigDecimal dollarCount) throws IOException {
+    public BigDecimal convertDollarToRubles(BigDecimal dollarCount) throws CurrencyConversionException {
         return dollarCount.divide(fetchDollarRate(), SCALE, RoundingMode.HALF_UP);
     }
 
     @Override
-    public BigDecimal convertRubleToDollar(BigDecimal rubleCount) throws IOException {
+    public BigDecimal convertRubleToDollar(BigDecimal rubleCount) throws CurrencyConversionException {
         return rubleCount.multiply(fetchDollarRate());
     }
 
-    private BigDecimal fetchDollarRate() throws IOException {
+    private BigDecimal fetchDollarRate() throws CurrencyConversionException {
         Request request = buildRequest();
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
-                throw new RuntimeException(INVALID_RESPONSE_ERROR);
+                throw new CurrencyConversionException(INVALID_RESPONSE_ERROR);
             }
             String responseBody = response.body().string();
             return parseDollarPriceToResponse(responseBody);
+        } catch (IOException e) {
+            throw new CurrencyConversionException(e);
         }
     }
 

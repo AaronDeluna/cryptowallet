@@ -10,6 +10,8 @@ import org.javaacademy.cryptowallet.entity.CryptoAccount;
 import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 import org.javaacademy.cryptowallet.exception.CryptoAccountIdExistException;
 import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
+import org.javaacademy.cryptowallet.exception.CryptoPriceRetrievalException;
+import org.javaacademy.cryptowallet.exception.CurrencyConversionException;
 import org.javaacademy.cryptowallet.exception.InsufficientFundsException;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
 import org.javaacademy.cryptowallet.mapper.CryptoAccountMapper;
@@ -44,14 +46,15 @@ public class CryptoAccountService {
     }
 
     public UUID createCryptoAccount(CreateCryptoAccountDto createDto)
-            throws CryptoAccountIdExistException {
+            throws CryptoAccountIdExistException, UserNotFoundException {
+        userStorageRepository.findByLogin(createDto.getUserLogin());
         CryptoAccount cryptoAccount = cryptoAccountMapper.toEntity(createDto);
         cryptoAccountRepository.save(cryptoAccount);
         return cryptoAccount.getUuid();
     }
 
     public void replenishAccountInRubles(RefillRequestDto refillRequestDto)
-            throws IOException, CryptoAccountNotFoundException {
+            throws CurrencyConversionException, CryptoAccountNotFoundException, CryptoPriceRetrievalException {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
                 cryptoAccountRepository.findByUuid(refillRequestDto.getAccountId())
         );
@@ -62,7 +65,8 @@ public class CryptoAccountService {
     }
 
     public String withdrawRublesFromAccount(WithdrawalRequestDto withdrawalRequestDto)
-            throws CryptoAccountNotFoundException, IOException, InsufficientFundsException {
+            throws CryptoAccountNotFoundException, InsufficientFundsException,
+            CryptoPriceRetrievalException, CurrencyConversionException {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
                 cryptoAccountRepository.findByUuid(withdrawalRequestDto.getAccountId())
         );
@@ -77,7 +81,8 @@ public class CryptoAccountService {
      * Вернет оставшеся количество рублей на конкретном счету
      */
     public BigDecimal showAccountBalanceInRublesById(UUID cryptoAccountId)
-            throws CryptoAccountNotFoundException, IOException {
+            throws CryptoAccountNotFoundException, CryptoPriceRetrievalException,
+            CurrencyConversionException {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
                 cryptoAccountRepository.findByUuid(cryptoAccountId)
         );
@@ -88,7 +93,7 @@ public class CryptoAccountService {
      * Показывает остаток рублей на всех крипто кошельках
      */
     public BigDecimal showAllAccountBalanceInRublesByUserLogin(String userLogin)
-            throws UserNotFoundException, IOException {
+            throws UserNotFoundException, CryptoPriceRetrievalException, CurrencyConversionException {
         userStorageRepository.findByLogin(userLogin);
         List<CryptoAccountDto> cryptoAccountsDto = cryptoAccountMapper.toDtos(
                 cryptoAccountRepository.findAllByUserLogin(userLogin)
@@ -104,7 +109,8 @@ public class CryptoAccountService {
     /**
      * Расчитывает рублевый эквивалент криптовалюты
      */
-    private BigDecimal calculateRubleAmount(CryptoAccountDto cryptoAccountDto) throws IOException {
+    private BigDecimal calculateRubleAmount(CryptoAccountDto cryptoAccountDto)
+            throws CryptoPriceRetrievalException, CurrencyConversionException {
         CryptoCurrency cryptoCurrency = cryptoAccountDto.getCurrency();
         BigDecimal cryptoPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
         BigDecimal dollarAmount = cryptoAccountDto.getCurrencyCount().multiply(cryptoPrice);
@@ -114,7 +120,8 @@ public class CryptoAccountService {
     /**
      * Расчитывает криптовалютный эквивалент
      */
-    private BigDecimal calculateCryptoAmount(BigDecimal rubleCount, CryptoCurrency cryptoCurrency) throws IOException {
+    private BigDecimal calculateCryptoAmount(BigDecimal rubleCount, CryptoCurrency cryptoCurrency)
+            throws CurrencyConversionException, CryptoPriceRetrievalException {
         BigDecimal cryptoPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
         BigDecimal dollarAmount = currencyConversionService.convertRubleToDollar(rubleCount);
         return dollarAmount.divide(cryptoPrice, SCALE, RoundingMode.HALF_UP);
