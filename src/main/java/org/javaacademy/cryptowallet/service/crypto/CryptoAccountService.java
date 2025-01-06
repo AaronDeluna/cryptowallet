@@ -20,7 +20,6 @@ import org.javaacademy.cryptowallet.repository.UserStorageRepository;
 import org.javaacademy.cryptowallet.service.currency_converter.CurrencyConversionService;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -31,7 +30,7 @@ import java.util.UUID;
 @Slf4j
 public class CryptoAccountService {
     private static final String INSUFFICIENT_FUNDS_MESSAGE = "На счету недостаточно средств!";
-    private static final String OPERATION_SUCCESS_SOLD_MESSAGE = "Операция прошла успешно. Продано: %s";
+    private static final String OPERATION_SUCCESS_SOLD_MESSAGE = "Операция прошла успешно. Продано: %s, %s";
     private static final int SCALE = 8;
     private final CryptoAccountRepository cryptoAccountRepository;
     private final UserStorageRepository userStorageRepository;
@@ -74,7 +73,7 @@ public class CryptoAccountService {
                 withdrawalRequestDto.getRubleAmount(), cryptoAccountDto.getCurrency()
         );
         decreaseAccountBalance(cryptoAccountDto, cryptoAmount);
-        return OPERATION_SUCCESS_SOLD_MESSAGE.formatted(cryptoAmount);
+        return OPERATION_SUCCESS_SOLD_MESSAGE.formatted(cryptoAmount, cryptoAccountDto.getCurrency().getDesc());
     }
 
     /**

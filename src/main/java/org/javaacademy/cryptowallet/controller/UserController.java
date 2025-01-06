@@ -1,10 +1,14 @@
 package org.javaacademy.cryptowallet.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.javaacademy.cryptowallet.dto.ErrorResponse;
 import org.javaacademy.cryptowallet.dto.ResetUserPasswordDto;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.service.user.UserService;
@@ -18,7 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
-@Tag(name = "User controller", description = "Контроллер для работы с пользователем")
+@Tag(
+        name = "User controller",
+        description = "Контроллер для работы с пользователем"
+)
 public class UserController {
     private final UserService userService;
 
@@ -27,11 +34,22 @@ public class UserController {
             description = "Регестрирует нового пользователя"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "202", description = "Создан"),
-            @ApiResponse(responseCode = "400", description = "Произошла ошибка")
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Успешно создан",
+                    content = @Content(schema = @Schema())
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Произошла ошибка",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            )
     })
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody UserDto userDto) {
+    public ResponseEntity<?> signup(@Valid @RequestBody UserDto userDto) {
         userService.save(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -41,11 +59,22 @@ public class UserController {
             description = "Сбрасывает пароль пользователя"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Успешно"),
-            @ApiResponse(responseCode = "400", description = "Произошла ошибка")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Успешно",
+                    content = @Content(schema = @Schema())
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Произошла ошибка",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            )
     })
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetUserPasswordDto resetUserPasswordDto) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetUserPasswordDto resetUserPasswordDto) {
         userService.resetPassword(resetUserPasswordDto);
         return ResponseEntity.ok().build();
     }

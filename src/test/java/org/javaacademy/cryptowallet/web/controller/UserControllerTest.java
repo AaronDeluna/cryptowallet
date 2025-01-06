@@ -124,7 +124,7 @@ public class UserControllerTest {
                 .post("/reset-password")
                 .then()
                 .spec(responseSpecification)
-                .statusCode(400);
+                .statusCode(404);
     }
 
     @Test

@@ -7,9 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
+import org.javaacademy.cryptowallet.dto.ErrorResponse;
 import org.javaacademy.cryptowallet.dto.RefillRequestDto;
 import org.javaacademy.cryptowallet.dto.WithdrawalRequestDto;
 import org.javaacademy.cryptowallet.service.crypto.CryptoAccountService;
@@ -32,49 +34,94 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/cryptowallet")
 @RequiredArgsConstructor
-@Tag(name = "Crypto account controller", description = "Контроллер для работы с крипто-кошельком")
+@Tag(
+        name = "Crypto account controller",
+        description = "Контроллер для работы с крипто-кошельком"
+)
 public class CryptoAccountController {
     private final CryptoAccountService cryptoAccountService;
 
-    @Operation(summary = "Получение всех крипто-кошельков",
-            description = "Получение всех крипто кошельков по логину пользователя")
+    @Operation(
+            summary = "Получение всех крипто-кошельков",
+            description = "Получение всех крипто кошельков по логину пользователя"
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Успешно", content = {
-                    @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = CryptoAccountDto.class)))
-            })
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Успешно",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = CryptoAccountDto.class)
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Пользователь не найден",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            )
     })
     @GetMapping
     @CacheEvict(value = "cryptoAccount")
     public ResponseEntity<?> getAllCryptoAccountByUserLogin(
             @RequestParam(name = "user_login") String userLogin) {
-        if (cryptoAccountService.getAllCryptoAccountByUserLogin(userLogin).isEmpty()) {
+        List<CryptoAccountDto> cryptoAccountDtos = cryptoAccountService.getAllCryptoAccountByUserLogin(userLogin);
+        if (cryptoAccountDtos.isEmpty()) {
             return ResponseEntity.ok(List.of());
         }
-        return ResponseEntity.ok().body(cryptoAccountService.getAllCryptoAccountByUserLogin(userLogin));
+        return ResponseEntity.ok().body(cryptoAccountDtos);
     }
 
-    @Operation(summary = "Создание нового крипто-кошелька",
-            description = "Создает новый крипто-кошелек для пользователя")
+    @Operation(
+            summary = "Создание нового крипто-кошелька",
+            description = "Создает новый крипто-кошелек для пользователя"
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "202", description = "Создан", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UUID.class))
-            }),
-            @ApiResponse(responseCode = "400", description = "Произошла ошибка", content = {
-                    @Content(mediaType = "plain/text", schema = @Schema(implementation = String.class))
-            })
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Создан",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UUID.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Пользователь не найден",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            )
     })
     @PostMapping
     @CacheEvict(value = "cryptoAccount", allEntries = true)
-    public ResponseEntity<?> createCryptoAccount(@RequestBody CreateCryptoAccountDto cryptoAccountDto) {
+    public ResponseEntity<?> createCryptoAccount(@Valid @RequestBody CreateCryptoAccountDto cryptoAccountDto) {
         UUID uuid = cryptoAccountService.createCryptoAccount(cryptoAccountDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(uuid);
     }
 
-    @Operation(summary = "Пополнение счета в рублях", description = "Пополняет счет крипто-кошелька")
+    @Operation(
+            summary = "Пополнение счета в рублях",
+            description = "Пополняет счет крипто-кошелька"
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Успешно"),
-            @ApiResponse(responseCode = "400", description = "Произошла ошибка")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Успешно"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Счет не найден",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            ),
     })
     @PostMapping("/refill")
     @CacheEvict(value = "cryptoAccount", allEntries = true)
@@ -83,12 +130,27 @@ public class CryptoAccountController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Снятие рублей со счета", description = "Снимает рубли с счета крипто-кошелька")
+    @Operation(
+            summary = "Снятие рублей со счета",
+            description = "Снимает рубли с счета крипто-кошелька"
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Успешно", content = {
-                    @Content(mediaType = "plain/text", schema = @Schema(implementation = String.class))
-            }),
-            @ApiResponse(responseCode = "400", description = "Произошла ошибка")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Успешно",
+                    content = @Content(
+                            mediaType = "plain/text",
+                            schema = @Schema(implementation = String.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Счет не найден",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            ),
     })
     @PostMapping("/withdrawal")
     @CacheEvict(value = "cryptoAccount", allEntries = true)
@@ -96,13 +158,25 @@ public class CryptoAccountController {
         return ResponseEntity.ok().body(cryptoAccountService.withdrawRublesFromAccount(withdrawalRequestDto));
     }
 
-    @Operation(summary = "Показывает рублевый эквивалент криптосчета по id",
+    @Operation(
+            summary = "Показывает рублевый эквивалент криптосчета по id",
             description = "Показывает рублевый эквивалент криптосчета по id крипто-кошелька")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Успешно", content = {
-                    @Content(mediaType = "plain/text", schema = @Schema(implementation = BigDecimal.class))
-            }),
-            @ApiResponse(responseCode = "400", description = "Произошла ошибка")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Успешно",
+                    content = @Content(
+                            mediaType = "plain/text",
+                            schema = @Schema(implementation = BigDecimal.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Счет не найден",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            )
     })
     @GetMapping("/balance/{id}")
     @Cacheable(value = "cryptoAccount")
@@ -110,13 +184,27 @@ public class CryptoAccountController {
         return ResponseEntity.ok().body(cryptoAccountService.showAccountBalanceInRublesById(id));
     }
 
-    @Operation(summary = "Показывает рублевый эквивалент всех крипто счетов",
-            description = "Показывает рублевый эквивалент всех крипто счетов по логину пользователя")
+    @Operation(
+            summary = "Показывает рублевый эквивалент всех крипто счетов",
+            description = "Показывает рублевый эквивалент всех крипто счетов по логину пользователя"
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Успешно", content = {
-                    @Content(mediaType = "plain/text", schema = @Schema(implementation = BigDecimal.class))
-            }),
-            @ApiResponse(responseCode = "400", description = "Произошла ошибка")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Успешно",
+                    content = @Content(
+                            mediaType = "plain/text",
+                            schema = @Schema(implementation = BigDecimal.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Пользователь не найден",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            )
     })
     @GetMapping("/balance/user/{login}")
     @Cacheable(value = "cryptoAccount")

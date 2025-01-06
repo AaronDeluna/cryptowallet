@@ -28,12 +28,7 @@ public class CryptoAccountMapper {
 
     public List<CryptoAccountDto> toDtos(List<CryptoAccount> cryptoAccounts) {
         return cryptoAccounts.stream()
-                .map(cryptoAccount -> CryptoAccountDto.builder()
-                        .uuid(cryptoAccount.getUuid())
-                        .userLogin(cryptoAccount.getUserLogin())
-                        .currency(cryptoAccount.getCurrency())
-                        .currencyCount(cryptoAccount.getCurrencyCount())
-                        .build())
+                .map(this::toDto)
                 .toList();
     }
 }

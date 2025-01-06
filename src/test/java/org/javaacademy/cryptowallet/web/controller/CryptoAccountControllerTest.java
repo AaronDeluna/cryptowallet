@@ -134,7 +134,6 @@ public class CryptoAccountControllerTest {
         assertEquals(expectedUserLogin, resultUserLogin);
         assertEquals(expectedCryptoCurrency, resultCryptoCurrency);
         assertEquals(0, resultCurrencyCount);
-
     }
 
     @Test
@@ -182,7 +181,7 @@ public class CryptoAccountControllerTest {
                 .post("/refill")
                 .then()
                 .spec(responseSpecification)
-                .statusCode(400);
+                .statusCode(404);
     }
 
     @Test
@@ -230,7 +229,7 @@ public class CryptoAccountControllerTest {
                 .post("/withdrawal")
                 .then()
                 .spec(responseSpecification)
-                .statusCode(400);
+                .statusCode(404);
     }
 
     @Test
@@ -299,7 +298,7 @@ public class CryptoAccountControllerTest {
                 .get("/balance/%s".formatted(cryptoAccountId))
                 .then()
                 .spec(responseSpecification)
-                .statusCode(400);
+                .statusCode(404);
     }
 
     @Test
@@ -340,7 +339,7 @@ public class CryptoAccountControllerTest {
                 .get("/balance/user/%s".formatted("Dima"))
                 .then()
                 .spec(responseSpecification)
-                .statusCode(400);
+                .statusCode(404);
     }
 
     private void createTestUser(String name) {

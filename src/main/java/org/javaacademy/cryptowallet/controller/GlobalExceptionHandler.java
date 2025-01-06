@@ -19,50 +19,29 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    //Мне тоже страшно на это смотреть)
-
-    @ExceptionHandler(UserLoginAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserLoginAlreadyExistsException(UserLoginAlreadyExistsException e) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+    @ExceptionHandler({
+            CurrencyConversionException.class,
+            CryptoPriceRetrievalException.class,
+            InsufficientFundsException.class,
+            CryptoAccountIdExistException.class,
+            InvalidPasswordException.class,
+            UserLoginAlreadyExistsException.class
+    })
+    public ResponseEntity<ErrorResponse> handleException(RuntimeException e) {
+        log.error(e.getMessage(), e);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+    @ExceptionHandler({
+            CryptoAccountNotFoundException.class,
+            UserNotFoundException.class,
+    })
+    public ResponseEntity<ErrorResponse> handleNotFountException(RuntimeException e) {
+        log.warn(e.getMessage(), e);
+        return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
-    @ExceptionHandler(InvalidPasswordException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidPasswordException(InvalidPasswordException e) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
-    }
-
-    @ExceptionHandler(CryptoAccountIdExistException.class)
-    public ResponseEntity<ErrorResponse> handleCryptoAccountIdExistException(CryptoAccountIdExistException e) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
-    }
-
-    @ExceptionHandler(CryptoAccountNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleCryptoAccountNotFoundException(CryptoAccountNotFoundException e) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
-    }
-
-    @ExceptionHandler(InsufficientFundsException.class)
-    public ResponseEntity<ErrorResponse> handleInsufficientFundsException(InsufficientFundsException e) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
-    }
-
-    @ExceptionHandler(CryptoPriceRetrievalException.class)
-    public ResponseEntity<ErrorResponse> handleCryptoPriceRetrievalException(CryptoPriceRetrievalException e) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
-    }
-
-    @ExceptionHandler(CurrencyConversionException.class)
-    public ResponseEntity<ErrorResponse> handleCurrencyConversionException(CurrencyConversionException e) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
-    }
-
-    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, Exception e) {
-        log.warn(message, e);
+    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message) {
         return ResponseEntity
                 .status(status)
                 .body(new ErrorResponse(status.value(), message));

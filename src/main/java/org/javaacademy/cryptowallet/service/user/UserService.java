@@ -11,6 +11,8 @@ import org.javaacademy.cryptowallet.mapper.UserMapper;
 import org.javaacademy.cryptowallet.repository.UserStorageRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -26,7 +28,7 @@ public class UserService {
     public void resetPassword(ResetUserPasswordDto resetUserPasswordDto) throws UserNotFoundException,
             InvalidPasswordException {
         User user = userStorageRepository.findByLogin(resetUserPasswordDto.getLogin());
-        if (!user.getPassword().equals(resetUserPasswordDto.getOldPassword())) {
+        if (!Objects.equals(user.getPassword(), resetUserPasswordDto.getOldPassword())) {
             throw new InvalidPasswordException(PASSWORD_NOT_CORRECT);
         }
         user.setPassword(resetUserPasswordDto.getNewPassword());
