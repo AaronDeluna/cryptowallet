@@ -8,12 +8,8 @@ import org.javaacademy.cryptowallet.dto.RefillRequestDto;
 import org.javaacademy.cryptowallet.dto.WithdrawalRequestDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
 import org.javaacademy.cryptowallet.entity.CryptoCurrency;
-import org.javaacademy.cryptowallet.exception.CryptoAccountIdExistException;
-import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
-import org.javaacademy.cryptowallet.exception.CryptoPriceRetrievalException;
-import org.javaacademy.cryptowallet.exception.CurrencyConversionException;
 import org.javaacademy.cryptowallet.exception.InsufficientFundsException;
-import org.javaacademy.cryptowallet.exception.UserNotFoundException;
+import org.javaacademy.cryptowallet.exception.InvalidCryptoCurrencyException;
 import org.javaacademy.cryptowallet.mapper.CryptoAccountMapper;
 import org.javaacademy.cryptowallet.repository.CryptoAccountRepository;
 import org.javaacademy.cryptowallet.repository.UserStorageRepository;
@@ -22,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +28,7 @@ import java.util.UUID;
 public class CryptoAccountService {
     private static final String INSUFFICIENT_FUNDS_MESSAGE = "На счету недостаточно средств!";
     private static final String OPERATION_SOLD_MESSAGE = "Операция прошла успешно. Продано: %s, %s";
+    private static final String INVALID_CRYPTOCURRENCY_TYPE_ERROR = "Не вреный тип криптовалюты: %s доступные валюты %s";
     private static final int SCALE = 8;
     private final CryptoAccountRepository cryptoAccountRepository;
     private final UserStorageRepository userStorageRepository;
@@ -44,16 +42,15 @@ public class CryptoAccountService {
                 .toList();
     }
 
-    public UUID createCryptoAccount(CreateCryptoAccountDto createDto)
-            throws CryptoAccountIdExistException, UserNotFoundException {
+    public UUID createCryptoAccount(CreateCryptoAccountDto createDto) {
+        validateCryptoCurrency(createDto.getCurrency());
         userStorageRepository.findByLogin(createDto.getUserLogin());
         CryptoAccount cryptoAccount = cryptoAccountMapper.toEntity(createDto);
         cryptoAccountRepository.save(cryptoAccount);
         return cryptoAccount.getUuid();
     }
 
-    public void replenishAccountInRubles(RefillRequestDto refillRequestDto)
-            throws CurrencyConversionException, CryptoAccountNotFoundException, CryptoPriceRetrievalException {
+    public void replenishAccountInRubles(RefillRequestDto refillRequestDto) {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
                 cryptoAccountRepository.findByUuid(refillRequestDto.getAccountId())
         );
@@ -63,9 +60,7 @@ public class CryptoAccountService {
         replenishAccountBalance(cryptoAccountDto, cryptoAmount);
     }
 
-    public String withdrawRublesFromAccount(WithdrawalRequestDto withdrawalRequestDto)
-            throws CryptoAccountNotFoundException, InsufficientFundsException,
-            CryptoPriceRetrievalException, CurrencyConversionException {
+    public String withdrawRublesFromAccount(WithdrawalRequestDto withdrawalRequestDto) {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
                 cryptoAccountRepository.findByUuid(withdrawalRequestDto.getAccountId())
         );
@@ -74,16 +69,14 @@ public class CryptoAccountService {
         );
         decreaseAccountBalance(cryptoAccountDto, cryptoAmount);
         return OPERATION_SOLD_MESSAGE.formatted(cryptoAmount.toPlainString(),
-                cryptoAccountDto.getCurrency().getDesc()
+                cryptoAccountDto.getCurrency()
         );
     }
 
     /**
      * Вернет оставшеся количество рублей на конкретном счету
      */
-    public BigDecimal showAccountBalanceInRublesById(UUID cryptoAccountId)
-            throws CryptoAccountNotFoundException, CryptoPriceRetrievalException,
-            CurrencyConversionException {
+    public BigDecimal showAccountBalanceInRublesById(UUID cryptoAccountId) {
         CryptoAccountDto cryptoAccountDto = cryptoAccountMapper.toDto(
                 cryptoAccountRepository.findByUuid(cryptoAccountId)
         );
@@ -93,8 +86,7 @@ public class CryptoAccountService {
     /**
      * Показывает остаток рублей на всех крипто кошельках
      */
-    public BigDecimal showAllAccountBalanceInRublesByUserLogin(String userLogin)
-            throws UserNotFoundException, CryptoPriceRetrievalException, CurrencyConversionException {
+    public BigDecimal showAllAccountBalanceInRublesByUserLogin(String userLogin) {
         userStorageRepository.findByLogin(userLogin);
         List<CryptoAccountDto> cryptoAccountsDto = cryptoAccountMapper.toDtos(
                 cryptoAccountRepository.findAllByUserLogin(userLogin)
@@ -110,9 +102,8 @@ public class CryptoAccountService {
     /**
      * Расчитывает рублевый эквивалент криптовалюты
      */
-    private BigDecimal calculateRubleAmount(CryptoAccountDto cryptoAccountDto)
-            throws CryptoPriceRetrievalException, CurrencyConversionException {
-        CryptoCurrency cryptoCurrency = cryptoAccountDto.getCurrency();
+    private BigDecimal calculateRubleAmount(CryptoAccountDto cryptoAccountDto) {
+        String cryptoCurrency = cryptoAccountDto.getCurrency();
         BigDecimal cryptoPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
         BigDecimal dollarAmount = cryptoAccountDto.getCurrencyCount().multiply(cryptoPrice);
         return currencyConversionService.convertDollarToRubles(dollarAmount);
@@ -121,31 +112,36 @@ public class CryptoAccountService {
     /**
      * Расчитывает криптовалютный эквивалент
      */
-    private BigDecimal calculateCryptoAmount(BigDecimal rubleCount, CryptoCurrency cryptoCurrency)
-            throws CurrencyConversionException, CryptoPriceRetrievalException {
+    private BigDecimal calculateCryptoAmount(BigDecimal rubleCount, String cryptoCurrency) {
         BigDecimal cryptoPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
         BigDecimal dollarAmount = currencyConversionService.convertRubleToDollar(rubleCount);
         return dollarAmount.divide(cryptoPrice, SCALE, RoundingMode.HALF_UP);
     }
 
-    private void validateSufficientFunds(CryptoAccountDto cryptoAccountDto, BigDecimal cryptoAmount)
-            throws InsufficientFundsException {
+    private void validateSufficientFunds(CryptoAccountDto cryptoAccountDto, BigDecimal cryptoAmount) {
         if (cryptoAccountDto.getCurrencyCount().compareTo(cryptoAmount) < 0) {
             throw new InsufficientFundsException(INSUFFICIENT_FUNDS_MESSAGE);
         }
     }
 
-    private void replenishAccountBalance(CryptoAccountDto cryptoAccountDto, BigDecimal dollarAmount)
-            throws CryptoAccountNotFoundException {
+    private void replenishAccountBalance(CryptoAccountDto cryptoAccountDto, BigDecimal dollarAmount) {
         CryptoAccount cryptoAccount = cryptoAccountRepository.findByUuid(cryptoAccountDto.getUuid());
         cryptoAccount.setCurrencyCount(cryptoAccount.getCurrencyCount().add(dollarAmount));
     }
 
-    private void decreaseAccountBalance(CryptoAccountDto cryptoAccountDto, BigDecimal cryptoAmount)
-            throws CryptoAccountNotFoundException, InsufficientFundsException {
+    private void decreaseAccountBalance(CryptoAccountDto cryptoAccountDto, BigDecimal cryptoAmount) {
         validateSufficientFunds(cryptoAccountDto, cryptoAmount);
         CryptoAccount cryptoAccount = cryptoAccountRepository.findByUuid(cryptoAccountDto.getUuid());
         cryptoAccount.setCurrencyCount(cryptoAccount.getCurrencyCount().subtract(cryptoAmount));
     }
 
+    private void validateCryptoCurrency(String currency) {
+        try {
+            CryptoCurrency.valueOf(currency);
+        } catch (IllegalArgumentException e) {
+            String correctCryptoCurrency = Arrays.toString(CryptoCurrency.values());
+            throw new InvalidCryptoCurrencyException(
+                    INVALID_CRYPTOCURRENCY_TYPE_ERROR.formatted(currency, correctCryptoCurrency));
+        }
+    }
 }

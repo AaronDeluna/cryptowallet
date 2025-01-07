@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 import org.javaacademy.cryptowallet.exception.CryptoPriceRetrievalException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -28,7 +27,7 @@ public class CryptoPriceServiceImpl implements CryptoPriceService {
     private final OkHttpClient client;
 
     @Override
-    public BigDecimal getCryptoPriceByCurrency(CryptoCurrency currency) throws CryptoPriceRetrievalException {
+    public BigDecimal getCryptoPriceByCurrency(String currency) throws CryptoPriceRetrievalException {
         Request request = buildRequest(currency);
 
         try (Response response = client.newCall(request).execute()) {
@@ -41,16 +40,16 @@ public class CryptoPriceServiceImpl implements CryptoPriceService {
         }
     }
 
-    private Request buildRequest(CryptoCurrency currency) {
+    private Request buildRequest(String currency) {
         return new Request.Builder()
-                .url(url.formatted(currency.getDesc()))
+                .url(url.formatted(currency))
                 .addHeader(API_KEY_HEADER, token)
                 .get()
                 .build();
     }
 
-    private BigDecimal extractPriceFromResponse(String responseBody, CryptoCurrency currency) {
-        String jsonPath = CRYPTO_CURRENCY_PRICE_PATH.formatted(currency.getDesc());
+    private BigDecimal extractPriceFromResponse(String responseBody, String currency) {
+        String jsonPath = CRYPTO_CURRENCY_PRICE_PATH.formatted(currency);
         return JsonPath.parse(responseBody)
                 .read(JsonPath.compile(jsonPath), BigDecimal.class);
     }

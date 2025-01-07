@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -20,7 +19,7 @@ public class CryptoAccountDto {
     @Schema(description = "Логин пользователя")
     private String userLogin;
     @Schema(description = "Тип крипто-валюты")
-    private CryptoCurrency currency;
+    private String currency;
     @Schema(description = "Количество крипто-валюты")
     private BigDecimal currencyCount;
 }

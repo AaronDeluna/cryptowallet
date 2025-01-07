@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
-import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 
 @Data
 @Builder
@@ -14,5 +13,5 @@ public class CreateCryptoAccountDto {
     private String userLogin;
     @Schema(description = "Тип крипто-валюты")
     @JsonProperty("crypto_currency")
-    private CryptoCurrency currency;
+    private String currency;
 }

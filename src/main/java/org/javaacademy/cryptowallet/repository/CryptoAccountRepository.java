@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class CryptoAccountRepository {
 
     public List<CryptoAccount> findAllByUserLogin(String userLogin) {
         return getStorage().values().stream()
-                .filter(cryptoAccount -> cryptoAccount.getUserLogin().equals(userLogin))
+                .filter(cryptoAccount -> Objects.equals(cryptoAccount.getUserLogin(), userLogin))
                 .toList();
     }
 

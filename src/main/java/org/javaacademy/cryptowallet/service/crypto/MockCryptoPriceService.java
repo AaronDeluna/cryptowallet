@@ -1,6 +1,5 @@
 package org.javaacademy.cryptowallet.service.crypto;
 
-import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ public class MockCryptoPriceService implements CryptoPriceService {
     private BigDecimal price;
 
     @Override
-    public BigDecimal getCryptoPriceByCurrency(CryptoCurrency currency) {
+    public BigDecimal getCryptoPriceByCurrency(String currency) {
         return price;
     }
 }

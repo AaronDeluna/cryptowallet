@@ -71,14 +71,14 @@ public class CryptoAccountControllerTest {
 
         UUID expectedUuid = cryptoAccountService.createCryptoAccount(CreateCryptoAccountDto.builder()
                 .userLogin(expectedName)
-                .currency(BTC)
+                .currency("BTC")
                 .build()
         );
 
         CryptoAccountDto expectedCryptoAccountDto = CryptoAccountDto.builder()
                 .uuid(expectedUuid)
                 .userLogin(expectedName)
-                .currency(BTC)
+                .currency("BTC")
                 .currencyCount(BigDecimal.ZERO)
                 .build();
 
@@ -105,7 +105,7 @@ public class CryptoAccountControllerTest {
     @DisplayName("Успешное создание нового крипто-кошелька")
     public void createCryptoAccountSuccess() {
         String expectedUserLogin = "Anton";
-        CryptoCurrency expectedCryptoCurrency = BTC;
+        String expectedCryptoCurrency = "BTC";
 
         createTestUser(expectedUserLogin);
 
@@ -128,7 +128,7 @@ public class CryptoAccountControllerTest {
         );
 
         String resultUserLogin = resultCryptoAccountDto.getUserLogin();
-        CryptoCurrency resultCryptoCurrency = resultCryptoAccountDto.getCurrency();
+        String resultCryptoCurrency = resultCryptoAccountDto.getCurrency();
         int resultCurrencyCount = ZERO.compareTo(resultCryptoAccountDto.getCurrencyCount());
 
         assertEquals(expectedUserLogin, resultUserLogin);
@@ -145,7 +145,7 @@ public class CryptoAccountControllerTest {
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
                 .userLogin(expectedUserLogin)
-                .currency(BTC)
+                .currency("BTC")
                 .build();
 
         UUID cryptoAccountId = cryptoAccountService.createCryptoAccount(createCryptoAccountDto);
@@ -193,7 +193,7 @@ public class CryptoAccountControllerTest {
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
                 .userLogin(expectedUserLogin)
-                .currency(BTC)
+                .currency("BTC")
                 .build();
 
         UUID cryptoAccountId = cryptoAccountService.createCryptoAccount(createCryptoAccountDto);
@@ -241,7 +241,7 @@ public class CryptoAccountControllerTest {
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
                 .userLogin(expectedLogin)
-                .currency(BTC)
+                .currency("BTC")
                 .build();
 
         UUID cryptoAccountId = cryptoAccountService.createCryptoAccount(createCryptoAccountDto);
@@ -270,7 +270,7 @@ public class CryptoAccountControllerTest {
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
                 .userLogin(expectedLogin)
-                .currency(BTC)
+                .currency("BTC")
                 .build();
 
         UUID cryptoAccountId = cryptoAccountService.createCryptoAccount(createCryptoAccountDto);
@@ -310,7 +310,7 @@ public class CryptoAccountControllerTest {
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
                 .userLogin(expectedLogin)
-                .currency(BTC)
+                .currency("BTC")
                 .build();
 
         for (int i = 0; i < 2; i++) {

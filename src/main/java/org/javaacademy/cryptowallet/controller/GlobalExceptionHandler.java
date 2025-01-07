@@ -1,5 +1,7 @@
 package org.javaacademy.cryptowallet.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.javaacademy.cryptowallet.dto.ErrorResponse;
 import org.javaacademy.cryptowallet.exception.CryptoAccountIdExistException;
@@ -7,6 +9,7 @@ import org.javaacademy.cryptowallet.exception.CryptoAccountNotFoundException;
 import org.javaacademy.cryptowallet.exception.CryptoPriceRetrievalException;
 import org.javaacademy.cryptowallet.exception.CurrencyConversionException;
 import org.javaacademy.cryptowallet.exception.InsufficientFundsException;
+import org.javaacademy.cryptowallet.exception.InvalidCryptoCurrencyException;
 import org.javaacademy.cryptowallet.exception.InvalidPasswordException;
 import org.javaacademy.cryptowallet.exception.UserLoginAlreadyExistsException;
 import org.javaacademy.cryptowallet.exception.UserNotFoundException;
@@ -25,10 +28,11 @@ public class GlobalExceptionHandler {
             InsufficientFundsException.class,
             CryptoAccountIdExistException.class,
             InvalidPasswordException.class,
-            UserLoginAlreadyExistsException.class
+            UserLoginAlreadyExistsException.class,
+            InvalidCryptoCurrencyException.class
     })
     public ResponseEntity<ErrorResponse> handleException(RuntimeException e) {
-        log.error(e.getMessage(), e);
+        log.warn(e.getMessage(), e);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
@@ -44,6 +48,6 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message) {
         return ResponseEntity
                 .status(status)
-                .body(new ErrorResponse(status.value(), message));
+                .body(new ErrorResponse(status.value(), status.name(), message));
     }
 }
