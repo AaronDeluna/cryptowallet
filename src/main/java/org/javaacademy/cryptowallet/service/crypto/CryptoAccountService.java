@@ -30,7 +30,7 @@ import java.util.UUID;
 @Slf4j
 public class CryptoAccountService {
     private static final String INSUFFICIENT_FUNDS_MESSAGE = "На счету недостаточно средств!";
-    private static final String OPERATION_SUCCESS_SOLD_MESSAGE = "Операция прошла успешно. Продано: %s, %s";
+    private static final String OPERATION_SOLD_MESSAGE = "Операция прошла успешно. Продано: %s, %s";
     private static final int SCALE = 8;
     private final CryptoAccountRepository cryptoAccountRepository;
     private final UserStorageRepository userStorageRepository;
@@ -73,7 +73,9 @@ public class CryptoAccountService {
                 withdrawalRequestDto.getRubleAmount(), cryptoAccountDto.getCurrency()
         );
         decreaseAccountBalance(cryptoAccountDto, cryptoAmount);
-        return OPERATION_SUCCESS_SOLD_MESSAGE.formatted(cryptoAmount, cryptoAccountDto.getCurrency().getDesc());
+        return OPERATION_SOLD_MESSAGE.formatted(cryptoAmount.toPlainString(),
+                cryptoAccountDto.getCurrency().getDesc()
+        );
     }
 
     /**
