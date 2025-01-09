@@ -63,24 +63,24 @@ public class CryptoAccountControllerTest {
     @Test
     @DisplayName("Успешное получение всех крипто кошельков пользователя по логину")
     public void getAllCryptoAccountByUserLoginSuccess() {
-        String expectedName = "Anton";
+        String login = "Anton";
 
-        createTestUser(expectedName);
+        createTestUser(login);
 
         UUID expectedUuid = cryptoAccountService.createCryptoAccount(CreateCryptoAccountDto.builder()
-                .userLogin(expectedName)
+                .userLogin(login)
                 .currency("BTC")
                 .build()
         );
 
         CryptoAccountDto expectedCryptoAccountDto = CryptoAccountDto.builder()
                 .uuid(expectedUuid)
-                .userLogin(expectedName)
+                .userLogin(login)
                 .currency("BTC")
                 .currencyCount(BigDecimal.ZERO)
                 .build();
 
-        String url = "cryptowallet?user_login=%s".formatted(expectedName);
+        String url = "cryptowallet?user_login=%s".formatted(login);
         List<CryptoAccountDto> cryptoAccountDtos = given()
                 .get(url)
                 .then()
@@ -138,14 +138,14 @@ public class CryptoAccountControllerTest {
     @DisplayName("Успешное возвращение статуса 400, при попытке создать "
             + "крипто-счет с несушествующим типом криптовалюты")
     public void shouldReturnBadRequestForInvalidCurrencyType() {
-        String expectedUserLogin = "Anton";
-        String expectedCryptoCurrency = "NOT";
+        String login = "Anton";
+        String cryptoCurrency = "NOT";
 
-        createTestUser(expectedUserLogin);
+        createTestUser(login);
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
-                .userLogin(expectedUserLogin)
-                .currency(expectedCryptoCurrency)
+                .userLogin(login)
+                .currency(cryptoCurrency)
                 .build();
 
         given(requestSpecification)
@@ -159,12 +159,12 @@ public class CryptoAccountControllerTest {
     @Test
     @DisplayName("Успешное пополнение крипто-счета, рублями")
     public void replenishAccountInRublesSuccess() {
-        String expectedUserLogin = "Anton";
+        String login = "Anton";
 
-        createTestUser(expectedUserLogin);
+        createTestUser(login);
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
-                .userLogin(expectedUserLogin)
+                .userLogin(login)
                 .currency("BTC")
                 .build();
 
@@ -207,12 +207,12 @@ public class CryptoAccountControllerTest {
     @Test
     @DisplayName("Успешное снятие средств с крипто-счет по id")
     public void withdrawRublesFromAccountSuccess() {
-        String expectedUserLogin = "Anton";
+        String login = "Anton";
 
-        createTestUser(expectedUserLogin);
+        createTestUser(login);
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
-                .userLogin(expectedUserLogin)
+                .userLogin(login)
                 .currency("BTC")
                 .build();
 
@@ -255,12 +255,12 @@ public class CryptoAccountControllerTest {
     @Test
     @DisplayName("Успешное возвращение статуса 400, в случае проведения операции с некорректной суммой на аккаунте")
     public void shouldReturnBadRequestWhenAmountIsInvalidForOperationOnAccount() {
-        String expectedLogin = "Anton";
+        String login = "Anton";
 
-        createTestUser(expectedLogin);
+        createTestUser(login);
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
-                .userLogin(expectedLogin)
+                .userLogin(login)
                 .currency("BTC")
                 .build();
 
@@ -284,12 +284,12 @@ public class CryptoAccountControllerTest {
     @Test
     @DisplayName("Успешно показывает рублевый эквивалент криптосчета по id")
     public void showAccountBalanceInRublesByIdSuccess() {
-        String expectedLogin = "Anton";
+        String login = "Anton";
 
-        createTestUser(expectedLogin);
+        createTestUser(login);
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
-                .userLogin(expectedLogin)
+                .userLogin(login)
                 .currency("BTC")
                 .build();
 
@@ -324,12 +324,12 @@ public class CryptoAccountControllerTest {
     @Test
     @DisplayName("Успешно показывает рублевый эквивалент всех крипто счетов")
     public void showAllAccountBalanceInRublesByUserLogin() {
-        String expectedLogin = "Anton";
+        String login = "Anton";
 
-        createTestUser(expectedLogin);
+        createTestUser(login);
 
         CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
-                .userLogin(expectedLogin)
+                .userLogin(login)
                 .currency("BTC")
                 .build();
 
@@ -340,7 +340,7 @@ public class CryptoAccountControllerTest {
         }
 
         BigDecimal resultRubleAmount = given(requestSpecification)
-                .get("/balance/user/%s".formatted(expectedLogin))
+                .get("/balance/user/%s".formatted(login))
                 .then()
                 .spec(responseSpecification)
                 .statusCode(200)
