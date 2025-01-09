@@ -14,7 +14,6 @@ import org.javaacademy.cryptowallet.dto.RefillRequestDto;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.dto.WithdrawalRequestDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
-import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 import org.javaacademy.cryptowallet.mapper.CryptoAccountMapper;
 import org.javaacademy.cryptowallet.service.crypto.CryptoAccountService;
 import org.javaacademy.cryptowallet.service.user.UserService;
@@ -35,7 +34,6 @@ import static io.restassured.RestAssured.given;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
-import static org.javaacademy.cryptowallet.entity.CryptoCurrency.BTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
@@ -134,6 +132,28 @@ public class CryptoAccountControllerTest {
         assertEquals(expectedUserLogin, resultUserLogin);
         assertEquals(expectedCryptoCurrency, resultCryptoCurrency);
         assertEquals(0, resultCurrencyCount);
+    }
+
+    @Test
+    @DisplayName("Успешное возвращение статуса 400, при попытке создать "
+            + "крипто-счет с несушествующим типом криптовалюты")
+    public void shouldReturnBadRequestForInvalidCurrencyType() {
+        String expectedUserLogin = "Anton";
+        String expectedCryptoCurrency = "NOT";
+
+        createTestUser(expectedUserLogin);
+
+        CreateCryptoAccountDto createCryptoAccountDto = CreateCryptoAccountDto.builder()
+                .userLogin(expectedUserLogin)
+                .currency(expectedCryptoCurrency)
+                .build();
+
+        given(requestSpecification)
+                .body(createCryptoAccountDto)
+                .post()
+                .then()
+                .spec(responseSpecification)
+                .statusCode(400);
     }
 
     @Test

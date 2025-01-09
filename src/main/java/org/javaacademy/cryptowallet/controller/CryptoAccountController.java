@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
@@ -99,7 +100,7 @@ public class CryptoAccountController {
     })
     @PostMapping
     @CacheEvict(value = "cryptoAccount", allEntries = true)
-    public ResponseEntity<?> createCryptoAccount(@RequestBody CreateCryptoAccountDto cryptoAccountDto) {
+    public ResponseEntity<?> createCryptoAccount(@Valid @RequestBody CreateCryptoAccountDto cryptoAccountDto) {
         UUID uuid = cryptoAccountService.createCryptoAccount(cryptoAccountDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(uuid);
     }
