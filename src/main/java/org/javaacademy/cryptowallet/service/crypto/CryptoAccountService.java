@@ -28,7 +28,8 @@ import java.util.UUID;
 public class CryptoAccountService {
     private static final String INSUFFICIENT_FUNDS_MESSAGE = "На счету недостаточно средств!";
     private static final String OPERATION_SOLD_MESSAGE = "Операция прошла успешно. Продано: %s, %s";
-    private static final String INVALID_CRYPTOCURRENCY_TYPE_ERROR = "Не вреный тип криптовалюты: %s доступные валюты %s";
+    private static final String INVALID_CRYPTOCURRENCY_TYPE_ERROR = "Не вреный тип криптовалюты:"
+            + " %s доступные валюты %s";
     private static final int SCALE = 8;
     private final CryptoAccountRepository cryptoAccountRepository;
     private final UserStorageRepository userStorageRepository;
