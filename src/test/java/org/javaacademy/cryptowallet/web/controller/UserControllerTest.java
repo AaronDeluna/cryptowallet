@@ -66,7 +66,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Успешное возвращение статуса 400 при попытке регистрации с уже существующим логином")
+    @DisplayName("Ошибка при попытке регистрации с уже существующим логином")
     public void shouldSuccessfullyReturnBadRequestWhenUsernameAlreadyExists() {
         UserDto userDto = UserDto.builder()
                 .userLogin("ivan")
@@ -111,7 +111,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Успешное возвращение статуса 400, при попытке сбросить пароль для несуществующего пользователя")
+    @DisplayName("Ошибка при попытке сбросить пароль для несуществующего пользователя")
     public void shouldSuccessfullyReturnBadRequestWhenUserDoesNotExist() {
         ResetUserPasswordDto resetUserPasswordDto = ResetUserPasswordDto.builder()
                 .login("ivan")
@@ -128,7 +128,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Успешное возвращение статуса 400, при попытке ввода не вернорго старого пароля")
+    @DisplayName("Ошибка при попытке ввода не вернорго старого пароля")
     public void shouldSuccessfullyReturnBadRequestWhenOldPasswordIsIncorrect() {
         UserDto userDto = UserDto.builder()
                 .userLogin("ivan")
@@ -147,7 +147,7 @@ public class UserControllerTest {
                 .post("/reset-password")
                 .then()
                 .spec(responseSpecification)
-                .statusCode(400);
+                .statusCode(403);
     }
 
 }

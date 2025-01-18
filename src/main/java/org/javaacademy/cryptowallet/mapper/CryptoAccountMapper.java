@@ -3,6 +3,7 @@ package org.javaacademy.cryptowallet.mapper;
 import org.javaacademy.cryptowallet.dto.CreateCryptoAccountDto;
 import org.javaacademy.cryptowallet.dto.CryptoAccountDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
+import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public class CryptoAccountMapper {
     public CryptoAccount toEntity(CreateCryptoAccountDto createDto) {
         return new CryptoAccount(
                 createDto.getUserLogin(),
-                createDto.getCurrency()
+                CryptoCurrency.valueOf(createDto.getCurrency())
         );
     }
 

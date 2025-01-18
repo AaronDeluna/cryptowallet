@@ -14,6 +14,7 @@ import org.javaacademy.cryptowallet.dto.RefillRequestDto;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.dto.WithdrawalRequestDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
+import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 import org.javaacademy.cryptowallet.mapper.CryptoAccountMapper;
 import org.javaacademy.cryptowallet.service.crypto.CryptoAccountService;
 import org.javaacademy.cryptowallet.service.user.UserService;
@@ -34,6 +35,7 @@ import static io.restassured.RestAssured.given;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
+import static org.javaacademy.cryptowallet.entity.CryptoCurrency.BTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
@@ -76,7 +78,7 @@ public class CryptoAccountControllerTest {
         CryptoAccountDto expectedCryptoAccountDto = CryptoAccountDto.builder()
                 .uuid(expectedUuid)
                 .userLogin(login)
-                .currency("BTC")
+                .currency(BTC)
                 .currencyCount(BigDecimal.ZERO)
                 .build();
 
@@ -126,7 +128,7 @@ public class CryptoAccountControllerTest {
         );
 
         String resultUserLogin = resultCryptoAccountDto.getUserLogin();
-        String resultCryptoCurrency = resultCryptoAccountDto.getCurrency();
+        String resultCryptoCurrency = String.valueOf(resultCryptoAccountDto.getCurrency());
         int resultCurrencyCount = ZERO.compareTo(resultCryptoAccountDto.getCurrencyCount());
 
         assertEquals(expectedUserLogin, resultUserLogin);
@@ -135,8 +137,7 @@ public class CryptoAccountControllerTest {
     }
 
     @Test
-    @DisplayName("Успешное возвращение статуса 400, при попытке создать "
-            + "крипто-счет с несушествующим типом криптовалюты")
+    @DisplayName("Ошибка при попытке создать крипто-счет с несушествующим типом криптовалюты")
     public void shouldReturnBadRequestForInvalidCurrencyType() {
         String login = "Anton";
         String cryptoCurrency = "NOT";
@@ -189,7 +190,7 @@ public class CryptoAccountControllerTest {
     }
 
     @Test
-    @DisplayName("Успешное возвращение статуса 400, при попытке пополнить несуществующий крипто-счет по id")
+    @DisplayName("Ошибка при попытке пополнить несуществующий крипто-счет по id")
     public void shouldReturnBadRequestWhenCryptoAccountDoesNotExistForTopUpById() {
         RefillRequestDto refillRequestDto = RefillRequestDto.builder()
                 .accountId(UUID.randomUUID())
@@ -237,7 +238,7 @@ public class CryptoAccountControllerTest {
     }
 
     @Test
-    @DisplayName("Успешное возвращение статуса 400, при попытке снять средства с несуществующего крипто-счет по id")
+    @DisplayName("Ошибка при попытке снять средства с несуществующего крипто-счет по id")
     public void shouldReturnBadRequestWhenCryptoAccountDoesNotExistForWithdrawalById() {
         WithdrawalRequestDto withdrawalRequestDto = WithdrawalRequestDto.builder()
                 .accountId(UUID.randomUUID())
@@ -253,7 +254,7 @@ public class CryptoAccountControllerTest {
     }
 
     @Test
-    @DisplayName("Успешное возвращение статуса 400, в случае проведения операции с некорректной суммой на аккаунте")
+    @DisplayName("Ошибка при попытке проведения операции с некорректной суммой на аккаунте")
     public void shouldReturnBadRequestWhenAmountIsInvalidForOperationOnAccount() {
         String login = "Anton";
 
@@ -310,8 +311,7 @@ public class CryptoAccountControllerTest {
     }
 
     @Test
-    @DisplayName("Успешное возвращение статуса 400, в случае если запрашивашивается"
-            + " рублевый эквивалет у несуществующего аккаунта")
+    @DisplayName("Ошибка при поппытке запросить рублевый эквивалет у несуществующего аккаунта")
     public void shouldReturnBadRequestWhenRequestingBalanceForNonExistentAccount() {
         UUID cryptoAccountId = UUID.randomUUID();
         given(requestSpecification)
@@ -352,8 +352,7 @@ public class CryptoAccountControllerTest {
     }
 
     @Test
-    @DisplayName("Успешное возвращение статуса 400, если при запросе эквивалента всех "
-            + "криптокошельков указанный логин не существует.")
+    @DisplayName("Ошибка при попытке запросить эквивалент всех криптокошельков у несуществующего логина")
     public void shouldReturnBadRequestWhenLoginDoesNotExist() {
         given(requestSpecification)
                 .get("/balance/user/%s".formatted("Dima"))

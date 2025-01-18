@@ -21,17 +21,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({
-            CurrencyConversionException.class,
-            CryptoPriceRetrievalException.class,
             InsufficientFundsException.class,
             CryptoAccountIdExistException.class,
-            InvalidPasswordException.class,
             UserLoginAlreadyExistsException.class,
             InvalidCryptoCurrencyException.class
     })
     public ResponseEntity<ErrorResponse> handleException(RuntimeException e) {
         log.warn(e.getMessage(), e);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler({
+            InvalidPasswordException.class
+    })
+    public ResponseEntity<ErrorResponse> handleInvalidPasswordException(RuntimeException e) {
+        log.warn(e.getMessage(), e);
+        return buildErrorResponse(HttpStatus.FORBIDDEN, e.getMessage());
     }
 
     @ExceptionHandler({
@@ -49,6 +54,14 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
+    @ExceptionHandler({
+            CryptoPriceRetrievalException.class,
+            CurrencyConversionException.class
+    })
+    public ResponseEntity<ErrorResponse> handleIntegrationServerError(RuntimeException e) {
+        log.warn(e.getMessage(), e);
+        return buildErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
+    }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message) {
         return ResponseEntity

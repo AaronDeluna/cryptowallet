@@ -1,9 +1,9 @@
 package org.javaacademy.cryptowallet.service.crypto;
 
-import org.javaacademy.cryptowallet.exception.CryptoPriceRetrievalException;
+import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 
 import java.math.BigDecimal;
 
 public interface CryptoPriceService {
-    BigDecimal getCryptoPriceByCurrency(String currency) throws CryptoPriceRetrievalException;
+    BigDecimal getCryptoPriceByCurrency(CryptoCurrency currency);
 }

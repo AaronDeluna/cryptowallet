@@ -104,7 +104,7 @@ public class CryptoAccountService {
      * Расчитывает рублевый эквивалент криптовалюты
      */
     private BigDecimal calculateRubleAmount(CryptoAccountDto cryptoAccountDto) {
-        String cryptoCurrency = cryptoAccountDto.getCurrency();
+        CryptoCurrency cryptoCurrency = cryptoAccountDto.getCurrency();
         BigDecimal cryptoPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
         BigDecimal dollarAmount = cryptoAccountDto.getCurrencyCount().multiply(cryptoPrice);
         return currencyConversionService.convertDollarToRubles(dollarAmount);
@@ -113,7 +113,7 @@ public class CryptoAccountService {
     /**
      * Расчитывает криптовалютный эквивалент
      */
-    private BigDecimal calculateCryptoAmount(BigDecimal rubleCount, String cryptoCurrency) {
+    private BigDecimal calculateCryptoAmount(BigDecimal rubleCount, CryptoCurrency cryptoCurrency) {
         BigDecimal cryptoPrice = cryptoPriceService.getCryptoPriceByCurrency(cryptoCurrency);
         BigDecimal dollarAmount = currencyConversionService.convertRubleToDollar(rubleCount);
         return dollarAmount.divide(cryptoPrice, SCALE, RoundingMode.HALF_UP);

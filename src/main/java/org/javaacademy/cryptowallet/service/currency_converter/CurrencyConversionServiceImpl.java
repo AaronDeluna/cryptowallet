@@ -26,12 +26,12 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService 
     private final OkHttpClient client;
 
     @Override
-    public BigDecimal convertDollarToRubles(BigDecimal dollarCount) throws CurrencyConversionException {
+    public BigDecimal convertDollarToRubles(BigDecimal dollarCount) {
         return dollarCount.divide(fetchDollarRate(), SCALE, RoundingMode.HALF_UP);
     }
 
     @Override
-    public BigDecimal convertRubleToDollar(BigDecimal rubleCount) throws CurrencyConversionException {
+    public BigDecimal convertRubleToDollar(BigDecimal rubleCount) {
         return rubleCount.multiply(fetchDollarRate());
     }
 

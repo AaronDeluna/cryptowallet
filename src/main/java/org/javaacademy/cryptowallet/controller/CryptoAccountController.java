@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -74,14 +73,10 @@ public class CryptoAccountController {
             )
     })
     @GetMapping
-    @CacheEvict(value = "cryptoAccount")
+    @Cacheable(value = "cryptoAccount")
     public ResponseEntity<?> getAllCryptoAccountByUserLogin(
             @RequestParam(name = "user_login") String userLogin) {
-        List<CryptoAccountDto> cryptoAccountDtos = cryptoAccountService.getAllCryptoAccountByUserLogin(userLogin);
-        if (cryptoAccountDtos.isEmpty()) {
-            return ResponseEntity.ok(List.of());
-        }
-        return ResponseEntity.ok().body(cryptoAccountDtos);
+        return ResponseEntity.ok().body(cryptoAccountService.getAllCryptoAccountByUserLogin(userLogin));
     }
 
     @Operation(
@@ -219,7 +214,7 @@ public class CryptoAccountController {
             )
     })
     @GetMapping("/balance/{id}")
-    @Cacheable(value = "cryptoAccount")
+    @Cacheable(value = "cryptoAccountBalance")
     public ResponseEntity<?> showAccountBalanceInRublesById(@PathVariable UUID id) {
         return ResponseEntity.ok().body(cryptoAccountService.showAccountBalanceInRublesById(id));
     }
@@ -255,7 +250,7 @@ public class CryptoAccountController {
             )
     })
     @GetMapping("/balance/user/{login}")
-    @Cacheable(value = "cryptoAccount")
+    @Cacheable(value = "AllCryptoAccountBalance")
     public ResponseEntity<?> showAllAccountBalanceInRublesByUserLogin(@PathVariable String login) {
         return ResponseEntity.ok().body(cryptoAccountService.showAllAccountBalanceInRublesByUserLogin(login));
     }

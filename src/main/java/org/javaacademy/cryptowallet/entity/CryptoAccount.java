@@ -17,10 +17,10 @@ import java.util.UUID;
 public class CryptoAccount {
     private UUID uuid;
     private String userLogin;
-    private String currency;
+    private CryptoCurrency currency;
     private BigDecimal currencyCount;
 
-    public CryptoAccount(String userLogin, String currency) {
+    public CryptoAccount(String userLogin, CryptoCurrency currency) {
         this.userLogin = userLogin;
         this.currency = currency;
     }
