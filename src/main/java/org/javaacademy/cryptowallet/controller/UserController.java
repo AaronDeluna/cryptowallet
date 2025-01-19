@@ -57,7 +57,7 @@ public class UserController {
             )
     })
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<HttpStatus> signup(@Valid @RequestBody UserDto userDto) {
         userService.save(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -90,7 +90,7 @@ public class UserController {
             )
     })
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetUserPasswordDto resetUserPasswordDto) {
+    public ResponseEntity<HttpStatus> resetPassword(@Valid @RequestBody ResetUserPasswordDto resetUserPasswordDto) {
         userService.resetPassword(resetUserPasswordDto);
         return ResponseEntity.ok().build();
     }

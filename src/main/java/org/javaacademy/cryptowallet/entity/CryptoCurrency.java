@@ -6,7 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum CryptoCurrency {
-    BTC("bitcoin"), ETH("ethereum"), SOL("solana");
+    BTC("bitcoin"),
+    ETH("ethereum"),
+    SOL("solana"),
+    ;
 
     private final String desc;
 }

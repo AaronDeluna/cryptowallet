@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -74,7 +75,7 @@ public class CryptoAccountController {
     })
     @GetMapping
     @Cacheable(value = "cryptoAccount")
-    public ResponseEntity<?> getAllCryptoAccountByUserLogin(
+    public ResponseEntity<List<CryptoAccountDto>> getAllCryptoAccountByUserLogin(
             @RequestParam(name = "user_login") String userLogin) {
         return ResponseEntity.ok().body(cryptoAccountService.getAllCryptoAccountByUserLogin(userLogin));
     }
@@ -111,7 +112,7 @@ public class CryptoAccountController {
     })
     @PostMapping
     @CacheEvict(value = "cryptoAccount", allEntries = true)
-    public ResponseEntity<?> createCryptoAccount(@Valid @RequestBody CreateCryptoAccountDto cryptoAccountDto) {
+    public ResponseEntity<UUID> createCryptoAccount(@Valid @RequestBody CreateCryptoAccountDto cryptoAccountDto) {
         UUID uuid = cryptoAccountService.createCryptoAccount(cryptoAccountDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(uuid);
     }
@@ -144,7 +145,7 @@ public class CryptoAccountController {
     })
     @PostMapping("/refill")
     @CacheEvict(value = "cryptoAccount", allEntries = true)
-    public ResponseEntity<?> replenishAccountInRubles(@RequestBody RefillRequestDto refillRequestDto) {
+    public ResponseEntity<HttpStatus> replenishAccountInRubles(@RequestBody RefillRequestDto refillRequestDto) {
         cryptoAccountService.replenishAccountInRubles(refillRequestDto);
         return ResponseEntity.ok().build();
     }
@@ -181,7 +182,7 @@ public class CryptoAccountController {
     })
     @PostMapping("/withdrawal")
     @CacheEvict(value = "cryptoAccount", allEntries = true)
-    public ResponseEntity<?> withdrawRublesFromAccount(@RequestBody WithdrawalRequestDto withdrawalRequestDto) {
+    public ResponseEntity<String> withdrawRublesFromAccount(@RequestBody WithdrawalRequestDto withdrawalRequestDto) {
         return ResponseEntity.ok().body(cryptoAccountService.withdrawRublesFromAccount(withdrawalRequestDto));
     }
 
@@ -215,7 +216,7 @@ public class CryptoAccountController {
     })
     @GetMapping("/balance/{id}")
     @Cacheable(value = "cryptoAccountBalance")
-    public ResponseEntity<?> showAccountBalanceInRublesById(@PathVariable UUID id) {
+    public ResponseEntity<BigDecimal> showAccountBalanceInRublesById(@PathVariable UUID id) {
         return ResponseEntity.ok().body(cryptoAccountService.showAccountBalanceInRublesById(id));
     }
 
@@ -251,7 +252,7 @@ public class CryptoAccountController {
     })
     @GetMapping("/balance/user/{login}")
     @Cacheable(value = "AllCryptoAccountBalance")
-    public ResponseEntity<?> showAllAccountBalanceInRublesByUserLogin(@PathVariable String login) {
+    public ResponseEntity<BigDecimal> showAllAccountBalanceInRublesByUserLogin(@PathVariable String login) {
         return ResponseEntity.ok().body(cryptoAccountService.showAllAccountBalanceInRublesByUserLogin(login));
     }
 }

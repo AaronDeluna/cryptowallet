@@ -14,7 +14,6 @@ import org.javaacademy.cryptowallet.dto.RefillRequestDto;
 import org.javaacademy.cryptowallet.dto.UserDto;
 import org.javaacademy.cryptowallet.dto.WithdrawalRequestDto;
 import org.javaacademy.cryptowallet.entity.CryptoAccount;
-import org.javaacademy.cryptowallet.entity.CryptoCurrency;
 import org.javaacademy.cryptowallet.mapper.CryptoAccountMapper;
 import org.javaacademy.cryptowallet.service.crypto.CryptoAccountService;
 import org.javaacademy.cryptowallet.service.user.UserService;
